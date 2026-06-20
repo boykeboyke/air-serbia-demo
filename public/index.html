@@ -59,8 +59,9 @@
     .fade-up { animation:fadeUp .7s ease-out both; }
     @keyframes fadeUp { from{opacity:0;transform:translateY(14px);} to{opacity:1;transform:none;} }
 
-    .logo-as { height:34px; width:auto; color:var(--as-navy); }
-    .logo-as-d { color:#fff; }
+    .logo-as { height:28px; width:auto; }
+    .logo-as-d { filter: brightness(0) invert(1); }
+    .logo-as-nav { filter: brightness(0) saturate(100%) invert(10%) sepia(50%) saturate(800%) hue-rotate(185deg) brightness(80%); }
     .nav-tab { font-size:14px; font-weight:600; color:var(--as-ink-2); padding:6px 2px; border-bottom:2px solid transparent; white-space:nowrap; }
     .nav-tab:hover { color:var(--as-navy); }
     .nav-tab.active { color:var(--as-navy); border-bottom-color:var(--as-red); }
@@ -89,7 +90,7 @@
 <header class="sticky top-0 z-40 bg-white/90 backdrop-blur border-b" style="border-color:var(--as-line)">
   <div class="max-w-7xl mx-auto px-5 h-16 flex items-center justify-between gap-4">
     <a href="#top" class="flex items-center gap-3 shrink-0">
-      <svg class="logo-as"><use href="#as-logo"></use></svg>
+      <img src="/assets/air-serbia-logo-official.svg" alt="Air Serbia" class="logo-as logo-as-nav" />
     </a>
     <nav class="hidden lg:flex items-center gap-6 overflow-x-auto">
       <a class="nav-tab" href="#agent" data-i18n="nav_agent">The Agent</a>
@@ -118,8 +119,8 @@
   <div class="border-b overflow-hidden" style="border-color:rgba(255,255,255,0.10)">
     <div class="py-2.5 whitespace-nowrap">
       <div class="marquee-track text-xs tracking-widest uppercase" style="color:#A9B6CC">
-        <span data-i18n="marq">103 destinations &nbsp;·&nbsp; 4.57M passengers in 2025 &nbsp;·&nbsp; A line that answers from 06:00 to 23:00, in Serbian and English &nbsp;·&nbsp;</span>
-        <span data-i18n="marq">103 destinations &nbsp;·&nbsp; 4.57M passengers in 2025 &nbsp;·&nbsp; A line that answers from 06:00 to 23:00, in Serbian and English &nbsp;·&nbsp;</span>
+        <span data-i18n="marq">103 destinations &nbsp;·&nbsp; 4.57M passengers in 2025 &nbsp;·&nbsp; 24/7, zero hold times, no seasonal hiring &nbsp;·&nbsp; Serbian and English, switched in real time &nbsp;·&nbsp;</span>
+        <span data-i18n="marq">103 destinations &nbsp;·&nbsp; 4.57M passengers in 2025 &nbsp;·&nbsp; 24/7, zero hold times, no seasonal hiring &nbsp;·&nbsp; Serbian and English, switched in real time &nbsp;·&nbsp;</span>
       </div>
     </div>
   </div>
@@ -131,7 +132,7 @@
         <span class="text-red" style="color:#FF6B83" data-i18n="hero_h1b">In their own language.</span>
       </h1>
       <p class="text-lg md:text-xl max-w-2xl mb-8" style="color:#C7D2E4" data-i18n="hero_sub">
-        Air Serbia's contact centre takes calls in Serbian and English, six in the morning to eleven at night. We built a voice agent that answers in under three seconds, knows the passenger before they speak, and handles your four biggest call reasons end to end. It switches language the instant it hears the caller.
+        Air Serbia carries 4.57 million passengers a year across 103 destinations. We built a voice agent that answers every call in under three seconds, 24 hours a day, 365 days a year, in Serbian or English. No hold queues. No peak-season hiring. No retraining. It knows the passenger before they speak.
       </p>
       <div class="flex flex-wrap gap-3">
         <a href="#agent" class="btn btn-red px-6 py-3" data-i18n="hero_cta1">Talk to your agent</a>
@@ -160,9 +161,9 @@
 <!-- ====================== METRIC STRIP ====================== -->
 <section class="bg-ground-2 border-b" style="border-color:var(--as-line)">
   <div class="max-w-7xl mx-auto px-5 py-12 grid md:grid-cols-3 gap-8">
-    <div><div class="stat text-4xl md:text-5xl" data-i18n="m1n">Under 3 sec</div><div class="text-sm text-muted mt-1" data-i18n="m1l">to answer, every call, no queue</div></div>
-    <div><div class="stat text-4xl md:text-5xl text-red" data-i18n="m2n">2 languages</div><div class="text-sm text-muted mt-1" data-i18n="m2l">Serbian and English, switched mid-call</div></div>
-    <div><div class="stat text-4xl md:text-5xl" data-i18n="m3n">24 / 7</div><div class="text-sm text-muted mt-1" data-i18n="m3l">including the hours after the line closes</div></div>
+    <div><div class="stat text-4xl md:text-5xl" data-i18n="m1n">24 / 7 / 365</div><div class="text-sm text-muted mt-1" data-i18n="m1l">always on, no after-hours gap, no public-holiday exception</div></div>
+    <div><div class="stat text-4xl md:text-5xl text-red" data-i18n="m2n">Zero hold time</div><div class="text-sm text-muted mt-1" data-i18n="m2l">answers in under 3 seconds, every call, no queue</div></div>
+    <div><div class="stat text-4xl md:text-5xl" data-i18n="m3n">No retraining</div><div class="text-sm text-muted mt-1" data-i18n="m3l">policy changes, new routes and fare rules updated in minutes, not weeks</div></div>
   </div>
   <div class="max-w-7xl mx-auto px-5 pb-6 -mt-4"><p class="text-xs text-muted" data-i18n="m_cap">Indicative of what we have seen across comparable operators. Air Serbia volumes from published 2025 results.</p></div>
 </section>
@@ -174,7 +175,7 @@
       <div>
         <div class="eyebrow mb-4" style="color:var(--macaw)" data-i18n="agent_eyebrow">Your agent, live</div>
         <h2 class="heading text-4xl md:text-5xl mb-5" data-i18n="agent_h">We already drafted your agent. Call it.</h2>
-        <p class="text-lg mb-6" style="color:#C7D2E4" data-i18n="agent_sub">This is not a video. It is a working PolyAI voice agent calling a live model of Air Serbia's systems. Press call and it greets the passenger by name, reads back their booking, and switches between Serbian and English the moment it hears the caller.</p>
+        <p class="text-lg mb-6" style="color:#C7D2E4" data-i18n="agent_sub">This is not a video. It is a working PolyAI voice agent calling a live model of Air Serbia's systems. It answers 24 hours a day with zero hold time. Press call and it greets the passenger by name, reads back their booking, and switches between Serbian and English the moment it hears the caller.</p>
         <div class="card-d p-6 mb-5">
           <button id="call-btn" onclick="startCall()" class="btn btn-red w-full justify-center py-4 text-lg">
             <span class="w-2.5 h-2.5 rounded-full pulse-dot" style="background:var(--macaw)"></span>
@@ -372,7 +373,7 @@
 <!-- ====================== FOOTER ====================== -->
 <footer class="bg-navy on-dark border-t" style="border-color:rgba(255,255,255,0.10)">
   <div class="max-w-7xl mx-auto px-5 py-10 flex flex-col md:flex-row items-center justify-between gap-6">
-    <svg class="logo-as logo-as-d" style="height:28px"><use href="#as-logo"></use></svg>
+    <img src="/assets/air-serbia-logo-official.svg" alt="Air Serbia" class="logo-as logo-as-d" />
     <div class="flex items-center gap-2 text-sm" style="color:#A9B6CC">
       <span data-i18n="foot_by">Voice AI by</span>
       <svg style="height:18px;color:#fff"><use href="#polyai-logo"></use></svg>
@@ -413,20 +414,20 @@ const DICT = {
   sr: {
     nav_agent:"Agent", nav_built:"Kako je napravljen", nav_results:"Rezultati", nav_about:"O PolyAI",
     nav_pricing:"Cene", nav_rollout:"Uvođenje", nav_next:"Sledeći korak", nav_cta:"Razgovaraj sa agentom",
-    marq:"103 destinacije &nbsp;·&nbsp; 4,57M putnika u 2025. &nbsp;·&nbsp; Linija koja odgovara od 06 do 23, na srpskom i engleskom &nbsp;·&nbsp;",
+    marq:"103 destinacije &nbsp;·&nbsp; 4,57M putnika u 2025. &nbsp;·&nbsp; 24/7, bez čekanja, bez sezonskog zapošljavanja &nbsp;·&nbsp; srpski i engleski, promena u realnom vremenu &nbsp;·&nbsp;",
     hero_eyebrow:"Glasovni AI za Air Serbia",
     hero_h1a:"Svaki poziv primljen.", hero_h1b:"Na jeziku putnika.",
-    hero_sub:"Kontakt centar Air Serbia prima pozive na srpskom i engleskom, od šest ujutru do jedanaest uveče. Napravili smo glasovnog agenta koji odgovara za manje od tri sekunde, poznaje putnika pre nego što progovori i rešava vaša četiri najčešća razloga poziva od početka do kraja. Menja jezik čim čuje pozivaoca.",
+    hero_sub:"Air Serbia prevozi 4,57 miliona putnika godišnje na 103 destinacije. Napravili smo glasovnog agenta koji odgovara na svaki poziv za manje od tri sekunde, 24 sata dnevno, 365 dana godišnje, na srpskom ili engleskom. Bez čekanja. Bez sezonskog zapošljavanja. Bez ponovne obuke. Poznaje putnika pre nego što progovori.",
     hero_cta1:"Razgovaraj sa agentom", hero_cta2:"Pogledaj rezultate",
     hero_trust:"Napravljeno u PolyAI Studio, uz radni model sistema za rezervacije, prtljag i status letova Air Serbia. Pripremljeno za ovaj razgovor.",
     hero_card_live:"Živa integracija", hero_card_label:"Proveri pravi let Air Serbia", hero_card_btn:"Proveri",
     hero_card_note:"Ovo je ista živa pretraga koju agent radi tokom poziva. Probaj JU324, JU500, JU200.",
-    m1n:"Ispod 3 sek", m1l:"do odgovora, svaki poziv, bez čekanja",
-    m2n:"2 jezika", m2l:"srpski i engleski, promena tokom poziva",
-    m3n:"24 / 7", m3l:"i u satima nakon zatvaranja linije",
+    m1n:"24 / 7 / 365", m1l:"uvek dostupno, bez praznika, bez noćnih sati koji nedostaju",
+    m2n:"Nula čekanja", m2l:"odgovara za manje od 3 sekunde, svaki poziv, bez reda",
+    m3n:"Bez ponovne obuke", m3l:"izmene pravila i novih ruta primenjene za nekoliko minuta, ne nedelja",
     m_cap:"Okvirno, na osnovu onoga što smo videli kod uporedivih operatera. Podaci o obimu iz objavljenih rezultata za 2025.",
     agent_eyebrow:"Vaš agent, uživo", agent_h:"Već smo napravili vašeg agenta. Pozovite ga.",
-    agent_sub:"Ovo nije video. To je radni PolyAI glasovni agent koji poziva živi model sistema Air Serbia. Pritisnite poziv i pozdraviće putnika po imenu, pročitati rezervaciju i prelaziti između srpskog i engleskog čim čuje pozivaoca.",
+    agent_sub:"Ovo nije video. To je radni PolyAI glasovni agent koji poziva živi model sistema Air Serbia. Odgovara 24 sata dnevno, bez čekanja. Pritisnite poziv i pozdraviće putnika po imenu, pročitati rezervaciju i prelaziti između srpskog i engleskog čim čuje pozivaoca.",
     agent_call:"Započni poziv",
     agent_call_note:"Vidžet za poziv preko sajta se povezuje kada se Studio agent objavi. Za sada je ovo mesto na koje se ubacuje.",
     agent_call_pending:"Glasovni agent još nije objavljen. Ovo je lokalna verzija; vidžet se povezuje nakon što se agent napravi u PolyAI Studio.",

@@ -1,76 +1,114 @@
-# Air Serbia x PolyAI - prospect demo
+# Air Serbia x PolyAI — prospect demo
 
-A PolyAI prospect demo for **Air Serbia (JU)**: a branded microsite + a mock contact-centre API a
-live **bilingual (Serbian / English)** PolyAI Studio voice agent calls during a meeting. One
-flight-status action is a **genuinely live external call**; everything else is a faithful mock.
+A PolyAI prospect demo for **Air Serbia (JU)**: an 8-tab bilingual microsite branded in Air Serbia's navy and red, backed by a mock contact-centre API, with a genuinely live flight-status integration and full PolyAI Studio voice-agent docs.
 
-Built with the `prospect-demo` skill. The page is the prop; the agent is the show.
+**GitHub:** https://github.com/boykeboyke/air-serbia-demo  
+**Implementation plan + status:** [`AirSerbia_implementation_plan.md`](AirSerbia_implementation_plan.md)
 
-## What's here
+---
 
-```
-air-serbia-demo/
-  server.js                 # Express: static site + mock API + LIVE flight-status proxy + /healthz
-  package.json              # express; "start": "node server.js"; node >= 18
-  public/
-    index.html              # 8-tab Air Serbia-branded site, with EN/SR toggle + live flight lookup
-    assets/air-serbia-logo.svg
-  docs/
-    system-prompt.md        # the agent's runtime persona + bilingual + flows + rules
-    builder-agent-prompt.md # paste into Studio's agentic builder to construct the agent
-    mock-api-payload.json   # sample API responses
-    demo-script.md          # the 45-min meeting running order
-  .env.example              # flight-status API key config (optional)
-  .gitignore
-```
+## What's in the demo
+
+| | |
+|---|---|
+| **Site** | 8-tab anchor-scroll page in Air Serbia brand. EN/SR toggle flips all copy to Serbian latin. In-page live flight-status lookup. |
+| **Mock API** | Passenger lookup (Milan Petrović, Elevate Silver), booking change, baggage add, check-in. |
+| **Live action** | `GET /api/flight-status/:fn` proxies AeroDataBox (or AviationStack), falls back to sample data if no key set. |
+| **Agent docs** | Bilingual `system-prompt.md` + `builder-agent-prompt.md` ready to paste into PolyAI Studio. |
+
+---
 
 ## Run locally
 
+Node.js is installed via nvm. Use the nvm-sourced path:
+
 ```bash
-npm install
-npm start                 # -> http://localhost:3000
+export NVM_DIR="$HOME/.nvm"; . "$NVM_DIR/nvm.sh"
+cd air-serbia-demo
+npm install       # first time only
+npm start         # → http://localhost:3000
 ```
 
-If `node` is missing, this repo was set up with nvm:
-```bash
-export NVM_DIR="$HOME/.nvm"; . "$NVM_DIR/nvm.sh"   # then npm install && npm start
-```
+### Test the API
 
-Check it:
 ```bash
 curl localhost:3000/healthz
 curl localhost:3000/api/passenger/+381641234567
 curl localhost:3000/api/flight-status/JU324
-curl -X POST localhost:3000/api/baggage/add -H 'content-type: application/json' -d '{"pnr":"JU8K2P","extra_bags":1}'
+curl -X POST localhost:3000/api/booking/change \
+  -H 'content-type: application/json' \
+  -d '{"pnr":"JU8K2P","new_date":"2026-07-05"}'
+curl -X POST localhost:3000/api/baggage/add \
+  -H 'content-type: application/json' \
+  -d '{"pnr":"JU8K2P","extra_bags":1}'
+curl -X POST localhost:3000/api/checkin \
+  -H 'content-type: application/json' \
+  -d '{"pnr":"JU8K2P","seat":"14C"}'
 ```
 
-## Live flight-status integration
+---
 
-`GET /api/flight-status/:flightNumber` makes a **real** external call when an API key is set, and
-falls back to deterministic sample data otherwise (so it always works on stage).
+## Activate the live flight-status lookup
 
-1. Copy `.env.example` to `.env`.
-2. Set **one** key:
-   - `AERODATABOX_KEY` - AeroDataBox via [RapidAPI](https://rapidapi.com) (HTTPS, free tier). Recommended.
-   - or `AVIATIONSTACK_KEY` - [AviationStack](https://aviationstack.com) free key (HTTP only on free tier).
-3. Restart. The lookup now reports `source: "live: ..."`.
+By default, flight status returns deterministic sample data. To make it a real external call:
 
-Reads can be live; **all writes (booking change, baggage, check-in) are mock** and never touch a real
-reservation system.
+1. Sign up at [RapidAPI](https://rapidapi.com) and subscribe to **AeroDataBox** (free tier: 500 req/month).
+2. Copy `.env.example` to `.env` and set your key:
+   ```
+   AERODATABOX_KEY=your_rapidapi_key_here
+   ```
+3. Restart the server. The `source` field will change to `"live: AeroDataBox"`.
 
-## Build the voice agent
+---
 
-Follow `docs/builder-agent-prompt.md` in PolyAI Studio. The agent is bilingual: it switches between
-Serbian and English at runtime via a `set_caller_language` function (not a prompt rule). It greets the
-passenger by name and answers from the record on call-open.
+## Build the Studio voice agent
 
-## Deploy (later)
+1. Make sure the server is running (locally or on Railway) so the agent can hit the API.
+2. Open `docs/builder-agent-prompt.md`, replace `[BASE_URL]` with your server URL.
+3. Paste the prompt into PolyAI Studio's agentic builder.
+4. The agent is bilingual — it switches Serbian/English via `conv.set_language()` at runtime. Read `docs/system-prompt.md` for the full wiring notes.
 
-Railway autodetects Node (`npm install` + `npm start`, sets `$PORT`). A mock-data demo is fine public.
-See the `prospect-demo` skill's `adk-and-deploy.md`.
+You'll need a `POLY_ADK_KEY` from [studio.us.poly.ai](https://studio.us.poly.ai) → account icon → Personal Access Tokens.
+
+---
+
+## Deploy to Railway
+
+```bash
+npm install -g @railway/cli
+export RAILWAY_API_TOKEN=your_token
+railway init && railway up && railway domain
+# Set the live flight key as an env var:
+railway variables --set "AERODATABOX_KEY=your_key"
+```
+
+Public deploy is fine — this demo contains only mock data.
+
+---
+
+## Project structure
+
+```
+air-serbia-demo/
+├── server.js                         # Express: mock API + live flight proxy
+├── package.json
+├── public/
+│   ├── index.html                    # 8-tab bilingual site
+│   └── assets/
+│       └── air-serbia-logo-official.svg
+├── docs/
+│   ├── system-prompt.md              # Studio agent persona (bilingual)
+│   ├── builder-agent-prompt.md       # Paste into agentic builder
+│   ├── mock-api-payload.json         # Sample payloads
+│   └── demo-script.md                # 45-min meeting script
+├── AirSerbia_implementation_plan.md  # Full task list with status
+├── CLAUDE.md                         # Navigation guide for AI assistants
+├── .env.example                      # API key config
+└── .gitignore
+```
+
+---
 
 ## Honesty
 
-The passenger record (Milan Petrović, PNR JU8K2P) is illustrative sample data. Brand colours and the
-wordmark are matched from public Air Serbia assets and are not an official brand handover. Case-study
-metrics are quoted from published PolyAI customer stories.
+The passenger record (Milan Petrović, PNR JU8K2P) is illustrative sample data. All writes (booking, baggage, check-in) are mock and never touch a real GDS. Case-study metrics are quoted from published PolyAI customer stories. Brand assets are reproduced from public Air Serbia materials for demo purposes only.
