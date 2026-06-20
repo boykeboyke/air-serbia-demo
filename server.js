@@ -1,4 +1,19 @@
 // Air Serbia x PolyAI - prospect demo server
+// Load .env file automatically if present (so `npm start` picks up API keys without manual export)
+const fs = require('fs');
+const path2 = require('path');
+const envPath = path2.join(__dirname, '.env');
+if (fs.existsSync(envPath)) {
+  fs.readFileSync(envPath, 'utf8').split('\n').forEach(line => {
+    const l = line.trim();
+    if (!l || l.startsWith('#')) return;
+    const idx = l.indexOf('=');
+    if (idx < 0) return;
+    const key = l.slice(0, idx).trim();
+    const val = l.slice(idx + 1).trim().replace(/^["']|["']$/g, '');
+    if (key && !process.env[key]) process.env[key] = val;
+  });
+}
 // -------------------------------------------------------------
 // Serves the branded microsite + a mock contact-centre API the
 // PolyAI Studio voice agent calls live during the meeting.
@@ -165,6 +180,25 @@ async function fromAeroDataBox(flightNumber) {
   }
 }
 
+// Normalise AviationStack raw status strings to human-readable labels.
+const AS_STATUS_MAP = {
+  scheduled: 'Scheduled', active: 'En route', landed: 'Landed',
+  cancelled: 'Cancelled', incident: 'Incident', diverted: 'Diverted'
+};
+function normaliseAvStatus(s) { return AS_STATUS_MAP[s] || (s ? s.charAt(0).toUpperCase() + s.slice(1) : 'Scheduled'); }
+
+// Format a UTC ISO datetime from AviationStack into local HH:MM.
+// AviationStack free tier returns UTC; Air Serbia operates on CET/CEST (UTC+1/+2).
+// We add 2h for CEST (summer) as a practical approximation for the demo.
+function avToLocal(iso) {
+  if (!iso) return '-';
+  try {
+    const d = new Date(iso);
+    d.setHours(d.getHours() + 2); // CEST offset (UTC+2, valid Apr–Oct)
+    return d.toISOString().slice(11, 16);
+  } catch { return iso.slice(11, 16) || '-'; }
+}
+
 // Adapter: AviationStack (free tier, by IATA flight number; note: free tier is HTTP only).
 async function fromAviationStack(flightNumber) {
   const key = process.env.AVIATIONSTACK_KEY;
@@ -177,18 +211,28 @@ async function fromAviationStack(flightNumber) {
     const data = await r.json();
     const f = data?.data?.[0];
     if (!f) return null;
+    // Build a friendly airport label: "City (IATA)" or just IATA if no name.
+    const depLabel = f.departure?.airport
+      ? `${f.departure.airport} (${f.departure.iata || ''})`
+      : (f.departure?.iata || '-');
+    const arrLabel = f.arrival?.airport
+      ? `${f.arrival.airport} (${f.arrival.iata || ''})`
+      : (f.arrival?.iata || '-');
+    // Prefer estimated times if available, else scheduled.
+    const depTime = f.departure?.estimated || f.departure?.scheduled;
+    const arrTime = f.arrival?.estimated || f.arrival?.scheduled;
     return {
       flight_number: flightNumber.toUpperCase(),
       airline: f.airline?.name || 'Air Serbia',
-      status: f.flight_status || 'scheduled',
+      status: normaliseAvStatus(f.flight_status),
       departure: {
-        airport: f.departure?.airport || '-',
-        scheduled_local: (f.departure?.scheduled || '').slice(11, 16) || '-',
+        airport: depLabel,
+        scheduled_local: avToLocal(depTime),
         terminal: f.departure?.terminal || '-'
       },
       arrival: {
-        airport: f.arrival?.airport || '-',
-        scheduled_local: (f.arrival?.scheduled || '').slice(11, 16) || '-',
+        airport: arrLabel,
+        scheduled_local: avToLocal(arrTime),
         terminal: f.arrival?.terminal || '-'
       },
       date: todayISO(),
