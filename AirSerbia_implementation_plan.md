@@ -1,6 +1,17 @@
 # Air Serbia x PolyAI — Implementation Plan
 
-_Last updated: 2026-06-20. Track this alongside the GitHub repo: https://github.com/boykeboyke/air-serbia-demo_
+_Last updated: 2026-06-20_
+_GitHub: https://github.com/boykeboyke/air-serbia-demo_
+_Railway: https://air-serbia-demo-production.up.railway.app_
+_Studio: https://studio.eu.poly.ai/poly-srpski-euw/PROJECT-LEQWVUHR_
+
+---
+
+## How the system works (summary)
+
+A passenger calls in → PolyAI Studio's voice agent answers in Serbian or English → the agent calls the Railway server via HTTP connectors to look up the passenger and perform actions → the Railway server proxies live data (flight status via AviationStack) or returns mock data for everything else. The same Railway server also hosts the branded microsite a prospect views in a browser.
+
+See `architecture diagram` in the README or the diagram in the conversation.
 
 ---
 
@@ -9,129 +20,129 @@ _Last updated: 2026-06-20. Track this alongside the GitHub repo: https://github.
 | Symbol | Meaning |
 |---|---|
 | ✅ | Done and working |
-| 🔶 | Mock / placeholder — needs real wiring for production |
-| 🔲 | Not started |
-| 🔑 | Needs an API key / credential |
+| 🔶 | Mock — works in demo, replaced by real systems in a pilot |
+| 🔲 | Not yet done |
+| 🔑 | Needs a credential |
 
 ---
 
-## Phase 1 — Local demo (COMPLETE)
+## Phase 1 — Local demo ✅ COMPLETE
 
 | Task | Status | Notes |
 |---|---|---|
-| Branded 8-tab microsite (Air Serbia brand) | ✅ | Navy `#0E2040` + red `#C8102E`, Archivo/Inter |
-| Air Serbia logo (official from website) | ✅ | SVG from logo.wine (airserbia.com blocks direct fetch) |
-| EN / SR bilingual toggle | ✅ | 126 i18n strings, all translated |
-| Marquee / copy corrected to 24/7 | ✅ | Removed "06:00–23:00"; emphasise zero hold times + no retraining |
-| Metric strip: 24/7/365, zero hold, no retraining | ✅ | Live |
-| Express mock API (server.js) | ✅ | Running on port 3000 |
-| Passenger lookup `GET /api/passenger/:phone` | ✅ | Returns demo passenger: Milan Petrović, Silver Elevate, JU324 BEG→CDG |
-| Booking change `POST /api/booking/change` | 🔶 | Mock — never writes to a real GDS |
-| Baggage add `POST /api/baggage/add` | 🔶 | Mock — returns 35 EUR per bag |
-| Check-in `POST /api/checkin` | 🔶 | Mock — returns boarding pass "issued" |
-| Flight status `GET /api/flight-status/:fn` | 🔶 | Falls back to sample data; see Phase 2 below |
-| `/healthz` endpoint | ✅ | Returns `{"status":"ok"}` |
-| Node.js installed via nvm | ✅ | v24.17.0 at `~/.nvm/versions/node/v24.17.0/bin/node` |
-| GitHub repo created | ✅ | https://github.com/boykeboyke/air-serbia-demo |
-| README | ✅ | `README.md` |
-| CLAUDE.md | ✅ | Navigation and context for AI assistants |
+| Branded 8-tab microsite | ✅ | Air Serbia navy + red, Archivo/Inter |
+| Air Serbia logo (official SVG) | ✅ | CSS filter recolours in nav/footer |
+| EN / SR bilingual toggle | ✅ | 126 strings, all translated |
+| 24/7 + zero hold + no retraining copy | ✅ | Removed "06:00–23:00" messaging |
+| Express mock API (server.js) | ✅ | passenger, booking, baggage, check-in |
+| Live flight status proxy | ✅ | AviationStack, graceful mock fallback |
+| Auto-load .env on npm start | ✅ | No manual key export needed |
+| Node.js v24.17.0 via nvm | ✅ | `~/.nvm/versions/node/v24.17.0/bin/node` |
+| GitHub repo | ✅ | https://github.com/boykeboyke/air-serbia-demo |
 
 ---
 
-## Phase 2 — Live flight-status integration
+## Phase 2 — Live flight status ✅ COMPLETE
 
 | Task | Status | Notes |
 |---|---|---|
-| AeroDataBox integration (server.js) | ✅ | Code written; env var `AERODATABOX_KEY` needed |
-| AviationStack fallback (server.js) | ✅ | Code written; env var `AVIATIONSTACK_KEY` needed |
-| **Get a free API key** (AeroDataBox via RapidAPI) | 🔑 | Sign up at https://rapidapi.com, subscribe to AeroDataBox. Free tier = 500 req/month. Copy key → `.env` as `AERODATABOX_KEY=…` |
-| Add `.env` file locally | 🔲 | `cp .env.example .env` then fill in key |
-| Verify live source label in hero flight-status card | 🔲 | Should show `"source":"live: AeroDataBox"` not "sample data" |
+| AviationStack integration | ✅ | `AVIATIONSTACK_KEY` in `.env` |
+| Status normalisation | ✅ | `active` → En route, `landed` → Landed, etc. |
+| Full airport names | ✅ | "Belgrade Nikola Tesla (BEG)" |
+| CEST timezone offset | ✅ | UTC+2 applied to departure/arrival times |
+| Graceful fallback | ✅ | Non-operating flights fall back to sample data |
 
 ---
 
-## Phase 3 — PolyAI Studio voice agent
+## Phase 3 — Railway deployment ✅ COMPLETE
 
 | Task | Status | Notes |
 |---|---|---|
-| `docs/system-prompt.md` | ✅ | Bilingual (EN/SR), call-open personalization, 4 flows, escalation rules |
-| `docs/builder-agent-prompt.md` | ✅ | Paste into Studio's agentic builder; wires all 5 HTTP connectors |
-| `docs/mock-api-payload.json` | ✅ | Sample payloads for Studio connector tests |
-| **Get a PolyAI ADK key** (`POLY_ADK_KEY`) | 🔑 | studio.us.poly.ai → account icon → Personal Access Tokens → create, save to `~/.config/claude/secrets.env` |
-| Create empty Studio project | 🔲 | studio.us.poly.ai → New project → blank. Note the project ID. |
-| Paste `builder-agent-prompt.md` into agentic builder | 🔲 | Replace `[BASE_URL]` with running server URL first |
-| Wire `lookup_passenger` HTTP connector | 🔲 | `GET [BASE_URL]/api/passenger/{phone}` |
-| Wire `get_flight_status` HTTP connector | 🔲 | `GET [BASE_URL]/api/flight-status/{flight_number}` — LIVE |
-| Wire `change_booking` HTTP connector | 🔲 | `POST [BASE_URL]/api/booking/change` |
-| Wire `add_baggage` HTTP connector | 🔲 | `POST [BASE_URL]/api/baggage/add` |
-| Wire `check_in` HTTP connector | 🔲 | `POST [BASE_URL]/api/checkin` |
-| Build `set_caller_language` function | 🔲 | `conv.set_language("sr-RS"/"en-US")` — bilingual switch |
-| Build `start_function` (call-open lookup) | 🔲 | Must store all fields on `conv.state`; inject into `# PASSENGER CONTEXT` |
-| Test scenario 1: Serbian booking change | 🔲 | Greet Milan, switch to SR, change JU324 date, confirm reference |
-| Test scenario 2: English baggage add | 🔲 | EN caller, add 1 bag, state 35 EUR, confirm |
-| Test scenario 3: Live flight status | 🔲 | Ask for JU324 status; agent calls live lookup, reads back |
-| Test scenario 4: Mid-call language switch | 🔲 | Open SR, switch to EN mid-call, agent follows |
-| Test scenario 5: Safety / emergency | 🔲 | Must transfer to human immediately, 100% of the time |
-| Tune voice (speed 1.2, stability 10-30, clarity 90) | 🔲 | Studio: Channels → Agent voice → gear icon |
+| Railway CLI installed | ✅ | v5.20.0 via npm |
+| Railway login (boykeboyke) | ✅ | lukacarb@gmail.com |
+| Project created | ✅ | air-serbia-demo on boykeboyke's Projects |
+| Deployed to Railway | ✅ | https://air-serbia-demo-production.up.railway.app |
+| AVIATIONSTACK_KEY set on Railway | ✅ | Live flight status works in production |
+| Public domain minted | ✅ | `air-serbia-demo-production.up.railway.app` |
+| /healthz verified | ✅ | Returns `{"status":"ok"}` |
 
 ---
 
-## Phase 4 — Railway deployment
+## Phase 4 — Studio voice agent 🔲 IN PROGRESS
 
 | Task | Status | Notes |
 |---|---|---|
-| Install Railway CLI | 🔲 | `npm install -g @railway/cli` |
-| Get `RAILWAY_API_TOKEN` | 🔑 | railway.app → account settings → tokens |
-| Confirm public vs gated | 🔲 | Mock-only demo is fine public |
-| `railway init && railway up && railway domain` | 🔲 | From inside `air-serbia-demo/` |
-| Set `AERODATABOX_KEY` as Railway env var | 🔲 | `railway variables --set "AERODATABOX_KEY=…"` |
-| Verify `GET https://[domain]/healthz` returns 200 | 🔲 | After deploy |
-| Update `[BASE_URL]` in `builder-agent-prompt.md` | 🔲 | Replace localhost with Railway domain |
+| Studio project created | ✅ | PROJECT-LEQWVUHR, euw-1 cluster |
+| Flows built in Studio UI | ✅ | User built manually |
+| `system-prompt.md` written | ✅ | Bilingual, call-open personalization, 4 flows |
+| `builder-agent-prompt.md` written | ✅ | Reference doc (not needed since flows built manually) |
+| **Wire HTTP connectors in Studio UI** | 🔲 | 5 endpoints — see table below |
+| Build `start_function` | 🔲 | Call-open passenger lookup → `conv.state` |
+| Build `set_caller_language()` | 🔲 | `conv.set_language("sr-RS"/"en-US")` |
+| Populate `# PASSENGER CONTEXT` in agent prompt | 🔲 | Inject `conv.state` fields so agent answers from record |
+| Test: Serbian greeting by name | 🔲 | Agent greets "Milan" in Serbian on call-open |
+| Test: live flight status lookup | 🔲 | Agent calls `/api/flight-status/JU500`, reads back live data |
+| Test: bilingual switch mid-call | 🔲 | Open in SR, switch to EN, agent follows |
+| Test: safety/emergency routing | 🔲 | Must transfer to human, 100% of the time |
+| Tune voice (speed 1.2, stability low) | 🔲 | Studio: Channels → Agent voice → gear |
+
+### HTTP connectors to wire in Studio UI (⚠️ UI-only — ADK cannot do this)
+
+| Connector name | Method | URL |
+|---|---|---|
+| `lookup_passenger` | GET | `https://air-serbia-demo-production.up.railway.app/api/passenger/{phone}` |
+| `get_flight_status` | GET | `https://air-serbia-demo-production.up.railway.app/api/flight-status/{flight_number}` |
+| `change_booking` | POST | `https://air-serbia-demo-production.up.railway.app/api/booking/change` |
+| `add_baggage` | POST | `https://air-serbia-demo-production.up.railway.app/api/baggage/add` |
+| `check_in` | POST | `https://air-serbia-demo-production.up.railway.app/api/checkin` |
 
 ---
 
-## Phase 5 — Widget + adversarial iteration
+## Phase 5 — Widget + adversarial iteration 🔲
 
 | Task | Status | Notes |
 |---|---|---|
-| Publish PolyAI web-call widget | 🔲 | Studio: Channels → Widgets → + Widget → Web calling. Website URL must match Railway domain exactly. |
-| Deploy agent to Sandbox env first | 🔲 | Token won't mint until agent is deployed to an environment |
-| Wire widget `<script>` into `public/index.html` | 🔲 | Replace the `<!-- POLYAI_WIDGET_PLACEHOLDER -->` comment in the "Your Agent" tab |
-| Run adversarial critic loop | 🔲 | See `reference/adversarial-iteration.md` — red-team agent on commercial value |
-| Agent reaches L3+ on growth-engine ladder | 🔲 | L0 answers → L1 knows caller → L2 acts → L3 grows revenue |
+| Deploy agent to Sandbox environment | 🔲 | Required before widget token can be minted |
+| Publish web-call widget | 🔲 | Studio: Channels → Widgets → + Widget → Web calling. Website URL = `https://air-serbia-demo-production.up.railway.app` |
+| Wire widget `<script>` into `public/index.html` | 🔲 | Replace the placeholder comment in "Your Agent" tab |
+| Redeploy Railway with widget script | 🔲 | `railway up --detach` from `air-serbia-demo/` |
+| Verify bubble renders on live site | 🔲 | `window.PolyphoneAPI` should be defined on page load |
+| Run adversarial critic loop | 🔲 | See `reference/adversarial-iteration.md` |
+| Agent reaches L3+ (grows revenue, not just answers) | 🔲 | Upsell ancillaries, proactive Elevate upgrade nudge |
 
 ---
 
-## Known mocks (honest list)
+## What's mocked vs live (honest list)
 
-| What's mocked | Why | What replaces it in a real pilot |
+| Component | Status | What replaces it in a real pilot |
 |---|---|---|
-| Passenger record (Milan Petrović, JU8K2P) | Can't connect to Air Serbia's Amadeus/CRM without a contract | Air Serbia's actual GDS/CRM connector via PolyAI's pre-built Amadeus or custom connector |
-| Booking change / cancel | No live GDS writes in a demo | Amadeus NDC or Air Serbia's booking API |
-| Baggage add | No live ancillary API | Air Serbia's ancillary/extras API |
-| Check-in | No live DCS access | Departure control system connector |
-| Flight status (no key) | AeroDataBox key not yet set | Add `AERODATABOX_KEY` to `.env` — then it's a real live call |
-| Elevate miles redemption | No loyalty API | Air Serbia's new Elevate program API |
+| Passenger record (Milan Petrović) | 🔶 Mock | Air Serbia's GDS/CRM via Amadeus or custom connector |
+| Booking change / cancel | 🔶 Mock | Amadeus NDC or Air Serbia's booking API |
+| Baggage add | 🔶 Mock | Air Serbia's ancillary/extras API |
+| Check-in | 🔶 Mock | Departure control system (DCS) connector |
+| Flight status | ✅ Live | AviationStack (already wired) |
+| Elevate miles / tier | 🔶 Mock | Air Serbia's new Elevate program API |
 
 ---
 
-## Quick commands reference
+## Quick commands
 
 ```bash
 # Run locally
 export NVM_DIR="$HOME/.nvm"; . "$NVM_DIR/nvm.sh"
-cd air-serbia-demo && npm start
+cd air-serbia-demo && npm start          # → http://localhost:3000
 
-# Test APIs
-curl localhost:3000/healthz
-curl localhost:3000/api/passenger/any
-curl localhost:3000/api/flight-status/JU324
-curl -X POST localhost:3000/api/baggage/add -H 'content-type: application/json' -d '{"pnr":"JU8K2P","extra_bags":1}'
+# Redeploy to Railway
+export NVM_DIR="$HOME/.nvm"; . "$NVM_DIR/nvm.sh"
+cd air-serbia-demo && railway up --detach
 
-# Push changes to GitHub
-git add -A && git commit -m "your message" && git push
+# Test production endpoints
+curl https://air-serbia-demo-production.up.railway.app/healthz
+curl https://air-serbia-demo-production.up.railway.app/api/flight-status/JU500
+curl https://air-serbia-demo-production.up.railway.app/api/passenger/any
 
-# GitHub CLI (installed at ~/bin/gh)
+# Push to GitHub
 export PATH="$HOME/bin:$PATH"
-gh repo view boykeboyke/air-serbia-demo
+cd air-serbia-demo
+git add -A && git -c commit.gpgsign=false commit -m "your message" && git push
 ```
