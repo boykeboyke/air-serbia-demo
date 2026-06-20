@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Air Serbia + PolyAI - Every caller answered, in their language</title>
+  <meta name="description" content="A bilingual (Serbian and English) PolyAI voice agent for Air Serbia's contact centre. Built around the calls that drive most inbound volume: manage booking, flight status, baggage and check-in. Built in PolyAI Studio." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* ---- AIR SERBIA BRAND ---- */
+      --as-navy:    #0E2040;  /* primary dark / ink (Pantone 295C) */
+      --as-navy-2:  #16294A;  /* alt dark section */
+      --as-navy-3:  #1E3A66;  /* lighter navy detail */
+      --as-red:     #C8102E;  /* Air Serbia red accent */
+      --as-red-2:   #A60D26;  /* red hover */
+      --as-ground:  #FFFFFF;  /* page background */
+      --as-ground-2:#F3F6FA;  /* alt section background */
+      --as-ink:     #0E2040;  /* headings */
+      --as-ink-2:   #41506A;  /* body text */
+      --as-muted:   #76839A;  /* captions / eyebrows */
+      --as-line:    #E1E7F0;  /* hairlines */
+      /* ---- POLYAI SPIRIT (single spark) ---- */
+      --macaw:      #D9EE50;
+    }
+    * { font-family:'Inter', Helvetica, Arial, sans-serif; }
+    body { background:var(--as-ground); color:var(--as-ink-2); -webkit-font-smoothing:antialiased; }
+    .display,.heading { font-family:'Archivo', Helvetica, Arial, sans-serif; color:var(--as-ink); }
+    .display { font-weight:800; letter-spacing:-0.03em; line-height:1.02; }
+    .heading { font-weight:700; letter-spacing:-0.02em; line-height:1.1; }
+    .eyebrow { font-family:'Archivo'; font-weight:700; letter-spacing:0.16em; text-transform:uppercase; font-size:12px; color:var(--as-red); }
+    .stat { font-family:'Archivo'; font-weight:800; letter-spacing:-0.03em; font-variant-numeric:tabular-nums; color:var(--as-ink); }
+    .bg-navy { background:var(--as-navy); } .bg-navy-2 { background:var(--as-navy-2); }
+    .bg-ground-2 { background:var(--as-ground-2); }
+    .text-navy { color:var(--as-navy); } .text-red { color:var(--as-red); } .text-muted { color:var(--as-muted); }
+    .on-dark { color:#fff; } .on-dark .heading, .on-dark .display { color:#fff; }
+    .on-dark .text-muted { color:#A9B6CC; }
+
+    .btn { border-radius:8px; font-weight:600; transition:.18s; display:inline-flex; align-items:center; gap:.5rem; }
+    .btn-red { background:var(--as-red); color:#fff; }
+    .btn-red:hover { background:var(--as-red-2); transform:translateY(-1px); }
+    .btn-navy { background:var(--as-navy); color:#fff; }
+    .btn-navy:hover { background:var(--as-navy-2); transform:translateY(-1px); }
+    .btn-ghost-d { border:1px solid rgba(255,255,255,.35); color:#fff; }
+    .btn-ghost-d:hover { border-color:var(--macaw); color:var(--macaw); }
+    .btn-ghost { border:1px solid var(--as-line); color:var(--as-navy); background:#fff; }
+    .btn-ghost:hover { border-color:var(--as-navy); }
+
+    .card { background:#fff; border:1px solid var(--as-line); border-radius:14px; transition:transform .25s, box-shadow .25s; }
+    .card:hover { transform:translateY(-4px); box-shadow:0 18px 40px -22px rgba(14,32,64,0.35); }
+    .card-d { background:var(--as-navy-2); border:1px solid rgba(255,255,255,0.10); border-radius:14px; }
+
+    .hero-glow { background-image:
+      radial-gradient(800px circle at 80% 6%, rgba(200,16,46,0.30), transparent 55%),
+      radial-gradient(620px circle at 6% 94%, rgba(111,217,255,0.10), transparent 55%); }
+    .fade-up { animation:fadeUp .7s ease-out both; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(14px);} to{opacity:1;transform:none;} }
+
+    .logo-as { height:34px; width:auto; color:var(--as-navy); }
+    .logo-as-d { color:#fff; }
+    .nav-tab { font-size:14px; font-weight:600; color:var(--as-ink-2); padding:6px 2px; border-bottom:2px solid transparent; white-space:nowrap; }
+    .nav-tab:hover { color:var(--as-navy); }
+    .nav-tab.active { color:var(--as-navy); border-bottom-color:var(--as-red); }
+    .pulse-dot { box-shadow:0 0 0 0 rgba(217,238,80,0.7); animation:pulse 2s infinite; }
+    @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(217,238,80,0.7);} 70%{box-shadow:0 0 0 12px rgba(217,238,80,0);} 100%{box-shadow:0 0 0 0 rgba(217,238,80,0);} }
+    section { scroll-margin-top:80px; }
+    .marquee-track { display:inline-flex; gap:3rem; animation:slide 28s linear infinite; }
+    @keyframes slide { from{transform:translateX(0);} to{transform:translateX(-50%);} }
+    html { scroll-behavior:smooth; }
+  </style>
+</head>
+<body>
+
+<!-- Air Serbia wordmark, recolourable via currentColor -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="as-logo" viewBox="0 0 560 400">
+    <g fill="currentColor" fill-rule="nonzero" transform="matrix(2.25012 0 0 2.25012 -2061.26 -2568.98)"><path d="m1031.65 1239.65 1.67-7.95c.33-1.59.84-2.93 1.53-4.01.68-1.08 1.49-1.94 2.43-2.59.89-.61 1.89-1.06 2.94-1.33s2.13-.41 3.22-.41c.08 0 .18.01.3.01h1.21s-.61.75-1.03 1.84c-.32.84-.34 2.51-.34 2.51l-1.7-.01c-1.28-.01-2.2.27-2.87.84-.68.57-1.15 1.47-1.4 2.69l-1.76 8.41zm12.62-5.8h3.81c-.15 1.08.06 1.83.63 2.26.59.51 1.52.76 2.79.76 1.13 0 2.03-.2 2.72-.59.67-.37 1.15-.99 1.35-1.72.31-1.15-1.07-2.08-4.14-2.81l-.09-.05-.41-.11c-1.74-.39-2.86-.81-3.36-1.24-.62-.4-.97-.97-1.06-1.72-.18-.65-.14-1.47.14-2.48.48-1.75 1.48-3.14 2.99-4.14 1.49-.97 3.42-1.45 5.78-1.44 2.22 0 3.78.5 4.71 1.51.93 1.11 1.19 2.56.77 4.36l-2.18-.01c-.84 0-1.33-.38-1.49-1.13-.08-.35-.26-.67-.51-.92-.53-.46-1.35-.7-2.48-.7-1.09 0-1.92.2-2.5.59-.63.37-1.09.97-1.28 1.67-.26.97.59 1.69 2.57 2.16.57.18.99.28 1.27.32.6.22 1.12.39 1.58.51.45.13.81.23 1.09.3.45.21.89.43 1.35.65.6.43 1.01.98 1.23 1.67.19.75.16 1.57-.08 2.47-.53 1.94-1.6 3.45-3.2 4.52-1.59 1-3.57 1.51-5.97 1.51-2.47-.01-4.18-.53-5.13-1.57-1.05-1.04-1.35-2.59-.9-4.63m16.91 5.78 4.54-16.57c.15-.54.47-1 .95-1.38.48-.37 1-.55 1.55-.55h11.65l-.87 3.17h-9.81l-1.09 3.98h7.3l-.34 1.25c-.15.53-.46.99-.95 1.36-.48.38-1 .56-1.54.56h-5.33l-1.31 4.74h9.81l-.94 3.44zm17.12.02 4.55-16.59c.14-.54.46-1 .94-1.37.49-.38 1.01-.57 1.55-.57l7.13.01c2.03 0 3.42.44 4.16 1.3.77.9.93 2.2.45 3.93-.31 1.14-.83 2.1-1.54 2.85-.63.72-1.47 1.23-2.5 1.56.76.29 1.22.72 1.39 1.29.18.54.13 1.45-.15 2.75l-.5 2.2c-.06.22-.12.45-.19.7s-.11.49-.14.7c-.07.65.05 1.06.33 1.24h-4.26c-.09-.37-.09-.76-.02-1.14.09-.57.16-.96.22-1.18l.49-1.99c.22-1.08.21-1.85-.02-2.31-.29-.4-.95-.6-1.96-.6h-4.09l-1.98 7.22zm6.73-10.45h4.52c.98 0 1.76-.2 2.34-.59s.98-1 1.21-1.83c.23-.82.15-1.43-.21-1.83-.31-.43-.91-.64-1.78-.64l-4.74-.01zm11.82 10.45 4.54-16.57c.15-.54.46-1 .95-1.38.48-.37 1.01-.57 1.55-.57h6.85c1.93 0 3.29.41 4.09 1.2.78.86.97 2.03.57 3.51-.26.93-.67 1.72-1.25 2.36-.59.62-1.3 1.12-2.09 1.45.84.4 1.41.96 1.72 1.67.29.68.28 1.58-.03 2.69-.48 1.8-1.45 3.19-2.89 4.2-1.46.97-3.28 1.44-5.46 1.44zm6.81-11.35h4.42c.94 0 1.67-.16 2.2-.48.52-.32.88-.82 1.06-1.5.19-.69.11-1.19-.24-1.51-.28-.29-.95-.44-2-.44h-4.36zm-2.19 8.02h4.57c1.02 0 1.85-.19 2.5-.59.61-.35 1.03-.97 1.27-1.83.23-.86.15-1.49-.25-1.88-.37-.36-1.12-.54-2.24-.54l-4.53-.01zm14.26 3.33 4.54-16.56c.14-.54.46-.99.94-1.37.49-.38 1.03-.59 1.57-.59h1.89l-5.07 18.52zm-85.01-15.23c.09-.52-.02-.98-.31-1.36-.31-.42-.75-.62-1.31-.63l-2.15-.01-.9 4.28c1.58-.71 3.13-1.47 4.67-2.27m-.71 3.3c-1.49.66-3.01 1.27-4.56 1.8l-2.12 10.12h4.19l2.53-12.02zm105.32 4.99h-4.81l4.76-7.84.51 8.36c1.12-.14 2.51.43 3.82.03l-1.14-12.14h-3c-.91 0-1.68.44-2.23 1.27l-10.95 17.25h4.1l2.26-3.79h7.27l.19 3.79h4.1l-.68-7.33c-2.71.48-4.2.4-4.2.4m-120.34 0h-4.82l4.77-7.84.38 6.55c1.13-.14 2.38-.45 3.7-.85l-.89-9.46h-3.01c-.91 0-1.68.45-2.23 1.28l-10.94 17.25h4.09l2.26-3.79h7.27l.2 3.79h4.1l-.69-7.33c-2.7.48-4.19.4-4.19.4m-50.147 5.69 2.594 3 1.666-1.93-3.294-3.81-1.664-1.93-1.543-1.8-1.533 2.04 1.736 2.01-.003.01z"/><path d="m998.111 1223.87c-2.359-2.32-4.868-3.44-7.455-3.33-2.057.08-3.734.94-4.867 1.73-.046.03-.086.06-.128.1l-.042.03c-.144.1-.28.2-.404.3l-1.79-1.94c-.438-.51-1.107-1.34-1.279-1.82-.131-.37-.162-.74-.203-.96-.149-.77-.233-2.04-.233-2.04s0-.31-.144-.65l-.178-.44s1.491-.66 2.558-.61l.64.79.023-.78v-1.12s-.069-.6-.64-1.06c-.425-.33-.62-.37-1.145-.44-.656-.1-.776.08-1.269-.38l-.451-.66-2.787.01-1.091.41s-.601.14-1.008 1.17l-.831 2.63s-.227.87-.274 2.18c-.051 1.32-.027.05-.027.05s-.059 1.97-.293 2.55l-.45 1.55c-.648 1.55-1.307 2.31-1.321 2.33l-2.504 2.9h.002l-.698.81-.698-.81.012-.01-1.537-1.76-.219-.25h-.002l-.768-.88c-.016-.02-.711-.83-1.375-2.46l-.413-1.42c-.234-.58-.293-2.55-.293-2.55s.022 1.27-.027-.05c-.048-1.31-.274-2.18-.274-2.18l-.831-2.63c-.405-1.03-1.007-1.17-1.007-1.17l-1.094-.41-2.787-.01-.45.67c-.491.45-.614.27-1.271.37-.523.08-.72.11-1.144.44-.571.46-.641 1.06-.641 1.06v1.12l.023.78.64-.78c1.067-.06 2.559.6 2.559.6l-.18.44c-.144.35-.144.65-.144.65s-.082 1.27-.233 2.04c-.043.22-.07.6-.203.96-.229.65-1.365 1.93-1.62 2.21l-1.434 1.55c-1.099-.88-3.001-2.07-5.436-2.16-2.586-.11-5.098 1.01-7.456 3.33l-.727.71.545.86c.08.13 2.019 3.13 5.495 3.8 2.254.44 4.708-.24 7.036-1.91l-1.694-1.92c-1.732 1.24-3.301 1.65-4.839 1.37-1.452-.28-2.554-1.19-3.207-1.88 1.564-1.28 3.147-1.9 4.721-1.85 2.755.1 4.688 2.27 4.705 2.29l4.083 4.72 1.662-1.93-3.123-3.61 3.651-4.56 1.49-1.86c.349 1.84 2.019 5.01 2.734 6.11l-4.055 4.73-1.619 1.89h-.002l-.022.03-.019.01h.002l-1.731 2.02c-.904.94-4.052 4.07-7.742 6.05 0 0 1.157.8 2.679.77.913-.01 1.958-.32 2.969-1.27.413-.4 1.015-.93 1.604-1.51 0 0-.276.68.382 1.9.506.94 1.393 1.5 2.592 1.55 1.875.06 3.224-.92 4.163-2.05l-1.346-1.49s-1.22 1.74-2.702.68c-.544-.51-.502-1.38-.502-1.38s-.012-.29.271-.89c1.009-1.72 3.773-5.33 5.413-7.43l1.264-1.6 1.801 2.08.003-.01.709.83h-.003l.04.04-3.156 3.92 1.436 1.61 3.336-3.65.007.01.008-.01 4.077 4.53-.004.01 1.689 1.9v-.01l.602.65.417.46c.928 1.02 2.21 1.86 3.949 1.79 1.201-.04 2.084-.6 2.591-1.54.66-1.23.382-1.9.382-1.9.591.58 1.193 1.11 1.606 1.5 2.686 2.55 5.646.51 5.646.51-3.691-1.98-6.838-5.11-7.744-6.05l-.983-1.15-2.058 2.31c1 1.37.949 2.09.949 2.09s.042.87-.501 1.38c-1.476 1.07-2.782-.77-2.782-.77l-4.094-4.97-.023-.03-2.101-2.59.04-.04-.004-.01 1.559-1.8h-.002l.941-1.09.413.52 2.675 3.62 1.881-2.24-3.061-3.57-.003.02-.301-.35c.714-1.11 2.385-4.28 2.732-6.12l1.489 1.86 3.65 4.56-.748.87h.002l-3.069 3.55-2.652 3.07-.797.92 1.666 1.93 1.324-1.53.137-.16 1.988-2.3 1.159-1.34 3.618-4.19c.015-.02 1.949-2.18 4.703-2.28 1.573-.06 3.155.56 4.72 1.84-.65.69-1.756 1.6-3.204 1.88-1.539.29-3.123-.14-4.857-1.38l-1.651 1.92c2.328 1.67 4.757 2.36 7.008 1.93 3.479-.68 5.417-3.68 5.497-3.81l.545-.86zm-25.921 19.1-1.708 2.02.193.22-.004.01 1.037 1.2c.545.67 2.043 2.39 2.274 4.17 0 0 1.48-2.04.355-4.9.002 0-.166-.75-2.145-2.72"/><path d="m970.839 1239.12-2.69 3.11c-2.706 2.52-2.914 3.46-2.914 3.46-1.125 2.87.355 4.9.355 4.9.23-1.78 1.727-3.5 2.273-4.17l1.038-1.2-.004-.01 3.718-4.3h.003l2.201-2.54-1.644-1.96z"/></g>
+  </symbol>
+  <!-- PolyAI logo -->
+  <symbol id="polyai-logo" viewBox="0 0 115 35">
+    <path d="M115 10.1037V7.85682H107.208V10.1037H109.746V22.7925C109.746 23.8565 108.883 24.723 107.815 24.723H107.203V26.9659H114.996V24.723H112.457V10.1037H115Z" fill="currentColor"></path><path d="M65.4891 26.9659V24.834H65.8916C67.0007 24.834 67.9002 23.9344 67.9002 22.8253V9.97221H65.7642V7.8403H70.4799V24.838H72.8912V26.97H65.4931L65.4891 26.9659Z" fill="currentColor"></path><path d="M105.268 26.9659H102.2L100.417 21.9093H91.9755L90.1681 26.9659H87.2066L94.4156 7.83627H98.1987L105.268 26.9659ZM94.7442 14.2032L92.8793 19.3954H99.5133L97.6772 14.2032C96.9377 12.0426 96.5269 10.8965 96.223 10.1037C95.9232 10.8965 95.4836 12.1822 94.7442 14.2032Z" fill="currentColor"></path><path d="M38.0252 26.97H35.2854V7.8403H43.0696C47.1238 7.8403 49.457 10.2187 49.457 13.6609C49.457 17.1032 47.0991 19.5103 43.0449 19.5103H38.0294V26.97H38.0252ZM38.0252 10.3542V17.132H42.5479C45.2344 17.132 46.5775 15.6573 46.5775 13.6609C46.5775 11.6646 45.2876 10.3542 42.5479 10.3542H38.0252Z" fill="currentColor"></path><path d="M57.0359 13.5253C53.3596 13.5253 50.3813 16.6184 50.3813 20.4386C50.3813 24.2587 53.3596 27.3518 57.0359 27.3518C60.7123 27.3518 63.6904 24.2587 63.6904 20.4386C63.6904 16.6225 60.7123 13.5253 57.0359 13.5253ZM57.0359 24.6776C54.7807 24.6776 52.9528 22.78 52.9528 20.4386C52.9528 18.0972 54.7807 16.1994 57.0359 16.1994C59.2912 16.1994 61.1189 18.0972 61.1189 20.4386C61.1189 22.78 59.291 24.6776 57.0359 24.6776Z" fill="currentColor"></path><path d="M84.3849 13.4145L82.0557 20.4387C81.4272 22.2708 81.2628 22.7884 81.0124 23.5276C80.766 22.8705 80.5194 22.2708 79.6158 20.1676L76.8183 13.4186H73.9388L79.9403 26.8098L79.2542 28.7486C78.8723 29.7879 78.3218 30.0055 77.3892 30.0055H75.6436L74.6495 32.2238V32.2977H77.4714C79.8539 32.2977 80.8686 31.4516 81.7475 28.8843L87.0918 13.4186H84.3766L84.3849 13.4145Z" fill="currentColor"></path><path d="M13.2618 30.0448C12.0788 30.0448 11.1217 31.0101 11.1217 32.2055C11.1217 33.4008 12.0788 34.366 13.2618 34.366C14.4449 34.366 15.402 33.4006 15.402 32.2055C15.402 31.0103 14.4449 30.0448 13.2618 30.0448Z" fill="currentColor"></path><path d="M13.2618 0C12.0788 0 11.1217 0.965319 11.1217 2.16066C11.1217 3.356 12.0788 4.32132 13.2618 4.32132C14.4449 4.32132 15.402 3.35602 15.402 2.16066C15.402 0.965298 14.4449 0 13.2618 0Z" fill="currentColor"></path><path d="M24.3836 6.3625C23.2006 6.3625 22.2435 7.32782 22.2435 8.52316C22.2435 9.7185 23.2006 10.6838 24.3836 10.6838C25.5666 10.6838 26.5237 9.7185 26.5237 8.52316C26.5237 7.32782 25.5666 6.3625 24.3836 6.3625Z" fill="currentColor"></path><path d="M2.14013 6.3625C0.957098 6.3625 0 7.33191 0 8.52316C0 9.71441 0.957098 10.6838 2.14013 10.6838C3.32316 10.6838 4.28024 9.7185 4.28024 8.52316C4.28024 7.32782 3.32314 6.3625 2.14013 6.3625Z" fill="currentColor"></path><path d="M24.3836 23.6823C23.2006 23.6823 22.2435 24.6475 22.2435 25.8428C22.2435 27.0382 23.2006 28.0036 24.3836 28.0036C25.5666 28.0036 26.5237 27.0382 26.5237 25.8428C26.5237 24.6475 25.5666 23.6823 24.3836 23.6823Z" fill="currentColor"></path><path d="M2.14013 23.6823C0.957098 23.6823 0 24.6475 0 25.8428C0 27.0341 0.957098 28.0036 2.14013 28.0036C3.32316 28.0036 4.28024 27.0382 4.28024 25.8428C4.28024 24.6475 3.32314 23.6823 2.14013 23.6823Z" fill="currentColor"></path><path d="M7.70097 23.665C8.88401 23.665 9.8411 22.6999 9.8411 21.5044C9.8411 20.309 8.88401 19.3438 7.70097 19.3438C6.51794 19.3438 5.56087 20.3091 5.56087 21.5044C5.56087 22.6998 6.51797 23.665 7.70097 23.665Z" fill="currentColor"></path><path d="M13.2618 19.3265C14.4449 19.3265 15.402 18.3611 15.402 17.1658C15.402 15.9705 14.4449 15.0051 13.2618 15.0051C12.0788 15.0051 11.1217 15.9704 11.1217 17.1658C11.1217 18.3612 12.0788 19.3265 13.2618 19.3265Z" fill="currentColor"></path><path d="M13.2618 28.0036C14.4449 28.0036 15.402 27.0382 15.402 25.8428C15.402 24.6475 14.4449 23.6823 13.2618 23.6823C12.0788 23.6823 11.1217 24.6475 11.1217 25.8428C11.1217 27.0382 12.0788 28.0036 13.2618 28.0036Z" fill="currentColor"></path><path d="M13.2618 10.6838C14.4449 10.6838 15.402 9.7185 15.402 8.52316C15.402 7.32782 14.4449 6.3625 13.2618 6.3625C12.0788 6.3625 11.1217 7.32782 11.1217 8.52316C11.1217 9.7185 12.0788 10.6838 13.2618 10.6838Z" fill="currentColor"></path><path d="M24.3836 19.3265C25.5666 19.3265 26.5237 18.3611 26.5237 17.1658C26.5237 15.9705 25.5666 15.0051 24.3836 15.0051C23.2006 15.0051 22.2435 15.9704 22.2435 17.1658C22.2435 18.3612 23.2006 19.3265 24.3836 19.3265Z" fill="currentColor"></path><path d="M2.14013 19.3265C3.32314 19.3265 4.28024 18.3611 4.28024 17.1658C4.28024 15.9705 3.32314 15.0051 2.14013 15.0051C0.95712 15.0051 0 15.9704 0 17.1658C0 18.3612 0.957098 19.3265 2.14013 19.3265Z" fill="currentColor"></path><path d="M18.8227 23.665C20.0058 23.665 20.9629 22.6999 20.9629 21.5044C20.9629 20.309 20.0058 19.3438 18.8227 19.3438C17.6397 19.3438 16.6826 20.3091 16.6826 21.5044C16.6826 22.6998 17.6397 23.665 18.8227 23.665Z" fill="currentColor"></path><path d="M7.70097 15.0051C8.88401 15.0051 9.8411 14.0398 9.8411 12.8445C9.8411 11.6491 8.88401 10.6838 7.70097 10.6838C6.51794 10.6838 5.56087 11.6491 5.56087 12.8445C5.56087 14.0398 6.51797 15.0051 7.70097 15.0051Z" fill="currentColor"></path><path d="M18.8227 15.0051C20.0058 15.0051 20.9629 14.0398 20.9629 12.8445C20.9629 11.6491 20.0058 10.6838 18.8227 10.6838C17.6397 10.6838 16.6826 11.6491 16.6826 12.8445C16.6826 14.0398 17.6397 15.0051 18.8227 15.0051Z" fill="currentColor"></path>
+  </symbol>
+</svg>
+
+<!-- ====================== STICKY NAV ====================== -->
+<header class="sticky top-0 z-40 bg-white/90 backdrop-blur border-b" style="border-color:var(--as-line)">
+  <div class="max-w-7xl mx-auto px-5 h-16 flex items-center justify-between gap-4">
+    <a href="#top" class="flex items-center gap-3 shrink-0">
+      <svg class="logo-as"><use href="#as-logo"></use></svg>
+    </a>
+    <nav class="hidden lg:flex items-center gap-6 overflow-x-auto">
+      <a class="nav-tab" href="#agent" data-i18n="nav_agent">The Agent</a>
+      <a class="nav-tab" href="#assumptions" data-i18n="nav_built">How it's built</a>
+      <a class="nav-tab" href="#proof" data-i18n="nav_results">Results</a>
+      <a class="nav-tab" href="#about" data-i18n="nav_about">About PolyAI</a>
+      <a class="nav-tab" href="#pricing" data-i18n="nav_pricing">Pricing</a>
+      <a class="nav-tab" href="#rollout" data-i18n="nav_rollout">Rollout</a>
+      <a class="nav-tab" href="#next" data-i18n="nav_next">What's next</a>
+    </nav>
+    <div class="flex items-center gap-3 shrink-0">
+      <div class="flex items-center text-xs font-semibold rounded-full border overflow-hidden" style="border-color:var(--as-line)">
+        <button id="lang-en" class="px-3 py-1.5" onclick="setLang('en')">EN</button>
+        <button id="lang-sr" class="px-3 py-1.5" onclick="setLang('sr')">SR</button>
+      </div>
+      <a href="#agent" class="btn btn-red px-4 py-2 text-sm" data-i18n="nav_cta">Talk to the agent</a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ====================== HERO ====================== -->
+<section class="bg-navy on-dark hero-glow">
+  <!-- announcement marquee, echoing Air Serbia's own promise -->
+  <div class="border-b overflow-hidden" style="border-color:rgba(255,255,255,0.10)">
+    <div class="py-2.5 whitespace-nowrap">
+      <div class="marquee-track text-xs tracking-widest uppercase" style="color:#A9B6CC">
+        <span data-i18n="marq">103 destinations &nbsp;·&nbsp; 4.57M passengers in 2025 &nbsp;·&nbsp; A line that answers from 06:00 to 23:00, in Serbian and English &nbsp;·&nbsp;</span>
+        <span data-i18n="marq">103 destinations &nbsp;·&nbsp; 4.57M passengers in 2025 &nbsp;·&nbsp; A line that answers from 06:00 to 23:00, in Serbian and English &nbsp;·&nbsp;</span>
+      </div>
+    </div>
+  </div>
+  <div class="max-w-7xl mx-auto px-5 py-20 md:py-28 grid lg:grid-cols-12 gap-12 items-center">
+    <div class="lg:col-span-7 fade-up">
+      <div class="eyebrow mb-4" style="color:var(--macaw)" data-i18n="hero_eyebrow">Voice AI for Air Serbia</div>
+      <h1 class="display text-5xl md:text-6xl lg:text-7xl mb-6">
+        <span data-i18n="hero_h1a">Every caller answered.</span><br>
+        <span class="text-red" style="color:#FF6B83" data-i18n="hero_h1b">In their own language.</span>
+      </h1>
+      <p class="text-lg md:text-xl max-w-2xl mb-8" style="color:#C7D2E4" data-i18n="hero_sub">
+        Air Serbia's contact centre takes calls in Serbian and English, six in the morning to eleven at night. We built a voice agent that answers in under three seconds, knows the passenger before they speak, and handles your four biggest call reasons end to end. It switches language the instant it hears the caller.
+      </p>
+      <div class="flex flex-wrap gap-3">
+        <a href="#agent" class="btn btn-red px-6 py-3" data-i18n="hero_cta1">Talk to your agent</a>
+        <a href="#proof" class="btn btn-ghost-d px-6 py-3" data-i18n="hero_cta2">See the results</a>
+      </div>
+      <p class="text-sm mt-6" style="color:#8A99B5" data-i18n="hero_trust">Built in PolyAI Studio, against a working model of Air Serbia's booking, baggage and flight-status systems. Drafted for this conversation.</p>
+    </div>
+    <div class="lg:col-span-5 fade-up">
+      <div class="card-d p-6">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="w-2.5 h-2.5 rounded-full pulse-dot" style="background:var(--macaw)"></span>
+          <span class="text-xs uppercase tracking-widest" style="color:#A9B6CC" data-i18n="hero_card_live">Live integration</span>
+        </div>
+        <div class="text-sm" style="color:#A9B6CC" data-i18n="hero_card_label">Check a real Air Serbia flight</div>
+        <div class="mt-3 flex gap-2">
+          <input id="fs-input" value="JU324" class="flex-1 rounded-lg px-3 py-2 text-sm text-navy" style="background:#fff" />
+          <button onclick="checkFlight()" class="btn btn-red px-4 py-2 text-sm" data-i18n="hero_card_btn">Check</button>
+        </div>
+        <div id="fs-result" class="mt-4 text-sm" style="color:#C7D2E4"></div>
+        <div class="mt-3 text-xs" style="color:#7A89A5" data-i18n="hero_card_note">This is the same live lookup the agent performs on a call. Try JU324, JU500, JU200.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== METRIC STRIP ====================== -->
+<section class="bg-ground-2 border-b" style="border-color:var(--as-line)">
+  <div class="max-w-7xl mx-auto px-5 py-12 grid md:grid-cols-3 gap-8">
+    <div><div class="stat text-4xl md:text-5xl" data-i18n="m1n">Under 3 sec</div><div class="text-sm text-muted mt-1" data-i18n="m1l">to answer, every call, no queue</div></div>
+    <div><div class="stat text-4xl md:text-5xl text-red" data-i18n="m2n">2 languages</div><div class="text-sm text-muted mt-1" data-i18n="m2l">Serbian and English, switched mid-call</div></div>
+    <div><div class="stat text-4xl md:text-5xl" data-i18n="m3n">24 / 7</div><div class="text-sm text-muted mt-1" data-i18n="m3l">including the hours after the line closes</div></div>
+  </div>
+  <div class="max-w-7xl mx-auto px-5 pb-6 -mt-4"><p class="text-xs text-muted" data-i18n="m_cap">Indicative of what we have seen across comparable operators. Air Serbia volumes from published 2025 results.</p></div>
+</section>
+
+<!-- ====================== TAB 2: THE AGENT ====================== -->
+<section id="agent" class="bg-navy on-dark">
+  <div class="max-w-7xl mx-auto px-5 py-20 md:py-28">
+    <div class="grid lg:grid-cols-2 gap-12 items-start">
+      <div>
+        <div class="eyebrow mb-4" style="color:var(--macaw)" data-i18n="agent_eyebrow">Your agent, live</div>
+        <h2 class="heading text-4xl md:text-5xl mb-5" data-i18n="agent_h">We already drafted your agent. Call it.</h2>
+        <p class="text-lg mb-6" style="color:#C7D2E4" data-i18n="agent_sub">This is not a video. It is a working PolyAI voice agent calling a live model of Air Serbia's systems. Press call and it greets the passenger by name, reads back their booking, and switches between Serbian and English the moment it hears the caller.</p>
+        <div class="card-d p-6 mb-5">
+          <button id="call-btn" onclick="startCall()" class="btn btn-red w-full justify-center py-4 text-lg">
+            <span class="w-2.5 h-2.5 rounded-full pulse-dot" style="background:var(--macaw)"></span>
+            <span data-i18n="agent_call">Start the call</span>
+          </button>
+          <p id="call-note" class="text-xs mt-3" style="color:#8A99B5" data-i18n="agent_call_note">The live web-call widget is wired in once the Studio agent is published. For now this is the placeholder it drops into.</p>
+        </div>
+        <div class="card-d p-5">
+          <div class="text-sm font-semibold mb-3" style="color:var(--macaw)" data-i18n="agent_try_h">Try saying</div>
+          <ul class="space-y-2 text-sm" style="color:#C7D2E4">
+            <li data-i18n="agent_try1">"Zdravo, ovde Milan Petrović, zovem zbog leta JU324." (greet it in Serbian, it answers in Serbian)</li>
+            <li data-i18n="agent_try2">"Can I add a bag to my booking?" (switch to English, it follows)</li>
+            <li data-i18n="agent_try3">"What is the status of flight JU324?" (it runs the live lookup)</li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <div class="text-sm font-semibold mb-4" style="color:#A9B6CC" data-i18n="agent_calls_h">Built for the calls your team takes every day</div>
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div class="card-d p-5"><div class="heading text-lg mb-1" style="color:#fff" data-i18n="ct1h">Manage booking</div><div class="text-sm" style="color:#A9B6CC" data-i18n="ct1d">Change a date or route, cancel, pick a seat, all against the live booking.</div></div>
+          <div class="card-d p-5"><div class="heading text-lg mb-1" style="color:#fff" data-i18n="ct2h">Flight status &amp; disruptions</div><div class="text-sm" style="color:#A9B6CC" data-i18n="ct2d">Real-time status, delays and rebooking, from a live flight lookup.</div></div>
+          <div class="card-d p-5"><div class="heading text-lg mb-1" style="color:#fff" data-i18n="ct3h">Baggage</div><div class="text-sm" style="color:#A9B6CC" data-i18n="ct3d">Allowance questions, extra bags added and confirmed on the spot.</div></div>
+          <div class="card-d p-5"><div class="heading text-lg mb-1" style="color:#fff" data-i18n="ct4h">Check-in &amp; boarding</div><div class="text-sm" style="color:#A9B6CC" data-i18n="ct4d">Online check-in, boarding pass, gate and timing questions.</div></div>
+        </div>
+        <div class="card-d p-5 mt-4">
+          <div class="text-sm" style="color:#A9B6CC"><span data-i18n="agent_also">It also answers from the record:</span> <span style="color:#fff" data-i18n="agent_also2">Elevate tier and miles, refund eligibility, and the passenger's upcoming itinerary, without a transfer.</span></div>
+        </div>
+        <div class="mt-6 grid grid-cols-3 gap-3 text-center">
+          <div class="card-d p-4"><div class="text-xs" style="color:#A9B6CC" data-i18n="step1">Recognised the caller</div></div>
+          <div class="card-d p-4"><div class="text-xs" style="color:#A9B6CC" data-i18n="step2">Understood the intent</div></div>
+          <div class="card-d p-4"><div class="text-xs" style="color:#A9B6CC" data-i18n="step3">Acted and confirmed</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== TAB 3: HOW IT'S BUILT / ASSUMPTIONS ====================== -->
+<section id="assumptions" class="bg-white">
+  <div class="max-w-7xl mx-auto px-5 py-20 md:py-28">
+    <div class="eyebrow mb-4" data-i18n="asm_eyebrow">How this was built</div>
+    <h2 class="heading text-4xl md:text-5xl mb-4" data-i18n="asm_h">Exactly what's real, and what we modelled.</h2>
+    <p class="text-lg text-muted max-w-3xl mb-12" data-i18n="asm_sub">A demo should be honest about its seams. Here are ours. Everything we do not flag here is genuinely working.</p>
+    <div class="grid md:grid-cols-2 gap-6">
+      <div class="card p-7">
+        <div class="flex items-center gap-2 mb-4"><span class="w-2.5 h-2.5 rounded-full" style="background:var(--macaw)"></span><div class="heading text-xl" data-i18n="asm_real_h">Real today</div></div>
+        <ul class="space-y-3 text-sm" style="color:var(--as-ink-2)">
+          <li data-i18n="asm_real1"><strong class="text-navy">The agent and its reasoning.</strong> A live PolyAI voice agent, not a script.</li>
+          <li data-i18n="asm_real2"><strong class="text-navy">Bilingual switching.</strong> Serbian and English, switched at runtime when it hears the caller.</li>
+          <li data-i18n="asm_real3"><strong class="text-navy">The flight-status lookup.</strong> A real external flight API call, the same one on this page.</li>
+          <li data-i18n="asm_real4"><strong class="text-navy">Personalization.</strong> It greets by name and reads the booking back from the record on call-open.</li>
+          <li data-i18n="asm_real5"><strong class="text-navy">The Studio build.</strong> Assembled in PolyAI Studio, the same builder your team would use.</li>
+        </ul>
+      </div>
+      <div class="card p-7">
+        <div class="flex items-center gap-2 mb-4"><span class="w-2.5 h-2.5 rounded-full" style="background:var(--as-muted)"></span><div class="heading text-xl" data-i18n="asm_mock_h">Modelled for this demo</div></div>
+        <ul class="space-y-3 text-sm" style="color:var(--as-ink-2)">
+          <li data-i18n="asm_mock1"><strong class="text-navy">The passenger record.</strong> One illustrative Elevate profile (Milan Petrović, PNR JU8K2P) stands in for your CRM.</li>
+          <li data-i18n="asm_mock2"><strong class="text-navy">Booking, baggage and check-in writes.</strong> Confirmed in the demo, not written to a live reservation system.</li>
+          <li data-i18n="asm_mock3"><strong class="text-navy">The API shape.</strong> A faithful mock of Air Serbia's booking and baggage data, not a link to production.</li>
+          <li data-i18n="asm_mock4"><strong class="text-navy">Brand assets.</strong> Colours and the wordmark are matched from public Air Serbia assets; type is a close free match.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card p-7 mt-6 bg-ground-2">
+      <p class="text-sm" style="color:var(--as-ink-2)" data-i18n="asm_why"><strong class="text-navy">Why it matters.</strong> That is the point. A working voice agent for Air Serbia, in days, with zero risk to your systems and no wait on a security review. A real pilot swaps the mock for your connectors and the sample record for your data. Everything else stays exactly as you heard it.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== TAB 4: PROOF ====================== -->
+<section id="proof" class="bg-ground-2">
+  <div class="max-w-7xl mx-auto px-5 py-20 md:py-28">
+    <div class="eyebrow mb-4" data-i18n="proof_eyebrow">Results</div>
+    <h2 class="heading text-4xl md:text-5xl mb-4" data-i18n="proof_h">The hardest conversations, already handled.</h2>
+    <p class="text-lg text-muted max-w-3xl mb-4" data-i18n="proof_sub">PolyAI runs live voice for enterprises handling tens of millions of calls a year. We have not published an airline study yet, so the proof below is the closest adjacent travel work plus flagship multilingual and high-volume deployments. Every number is quoted from a published PolyAI customer story.</p>
+    <div class="grid md:grid-cols-3 gap-6 mt-10">
+      <div class="card p-7">
+        <div class="text-xs uppercase tracking-widest text-red mb-3" data-i18n="cs1_tag">Utility · bilingual EN + ES</div>
+        <div class="heading text-2xl mb-4">PG&amp;E</div>
+        <div class="grid grid-cols-2 gap-3 mb-4">
+          <div><div class="stat text-2xl">35,000</div><div class="text-xs text-muted" data-i18n="cs1_s1">labour hours saved</div></div>
+          <div><div class="stat text-2xl">67%</div><div class="text-xs text-muted" data-i18n="cs1_s2">containment</div></div>
+          <div><div class="stat text-2xl">+22%</div><div class="text-xs text-muted" data-i18n="cs1_s3">CSAT increase</div></div>
+          <div><div class="stat text-2xl">-25%</div><div class="text-xs text-muted" data-i18n="cs1_s4">customer effort</div></div>
+        </div>
+        <p class="text-sm text-muted italic">"Customers have been thanking the AI agent for its help."</p>
+      </div>
+      <div class="card p-7">
+        <div class="text-xs uppercase tracking-widest text-red mb-3" data-i18n="cs2_tag">Travel</div>
+        <div class="heading text-2xl mb-4">Hopper</div>
+        <div class="grid grid-cols-2 gap-3 mb-4">
+          <div><div class="stat text-2xl">15%</div><div class="text-xs text-muted" data-i18n="cs2_s1">of calls fully resolved</div></div>
+          <div><div class="stat text-2xl">24/7</div><div class="text-xs text-muted" data-i18n="cs2_s2">always answered</div></div>
+        </div>
+        <p class="text-sm text-muted" data-i18n="cs2_d">FAQ and routing for a high-volume travel app, handled around the clock.</p>
+      </div>
+      <div class="card p-7">
+        <div class="text-xs uppercase tracking-widest text-red mb-3" data-i18n="cs3_tag">Banking · Balkans · multilingual</div>
+        <div class="heading text-2xl mb-4">UniCredit / Zagrebačka banka</div>
+        <div class="grid grid-cols-2 gap-3 mb-4">
+          <div><div class="stat text-2xl">27%</div><div class="text-xs text-muted" data-i18n="cs3_s1">call automation</div></div>
+          <div><div class="stat text-2xl">83%</div><div class="text-xs text-muted" data-i18n="cs3_s2">faster routing</div></div>
+          <div><div class="stat text-2xl">-10%</div><div class="text-xs text-muted" data-i18n="cs3_s3">abandonment</div></div>
+          <div><div class="stat text-2xl">+14</div><div class="text-xs text-muted" data-i18n="cs3_s4">NPS</div></div>
+        </div>
+        <p class="text-sm text-muted" data-i18n="cs3_d">Natural-language routing in the region, in the local language.</p>
+      </div>
+    </div>
+    <div class="mt-12">
+      <div class="text-xs uppercase tracking-widest text-muted mb-4" data-i18n="proof_logos_h">Trusted on the phones at</div>
+      <div class="flex flex-wrap gap-x-8 gap-y-3 text-lg font-semibold text-navy opacity-70">
+        <span>FedEx</span><span>Marriott</span><span>Volkswagen</span><span>PG&amp;E</span><span>Carter's</span><span>Hopper</span><span>Allstate</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== TAB 5: ABOUT POLYAI ====================== -->
+<section id="about" class="bg-white">
+  <div class="max-w-7xl mx-auto px-5 py-20 md:py-28">
+    <div class="grid lg:grid-cols-2 gap-12 items-center">
+      <div>
+        <div class="flex items-center gap-2 mb-4">
+          <span class="eyebrow" style="color:var(--as-muted)" data-i18n="about_eyebrow">About</span>
+          <svg style="height:20px;color:var(--as-navy)"><use href="#polyai-logo"></use></svg>
+        </div>
+        <h2 class="heading text-4xl md:text-5xl mb-5" data-i18n="about_h">The voice platform enterprises trust on their hardest calls.</h2>
+        <p class="text-lg text-muted mb-4" data-i18n="about_body">PolyAI builds voice agents that hold a real conversation and get something done. Enterprises run their phone lines on us across utilities, banking, travel, hospitality and retail. The agents run on Raven, our own voice model, trained on over a billion enterprise conversations. Not a chatbot. Not voice bolted onto chat.</p>
+        <p class="text-sm text-muted" data-i18n="about_lang">Over 100 platform languages and Raven speaking 24 and more, so a Serbian-and-English line is the start, not the ceiling.</p>
+      </div>
+      <div class="grid gap-4">
+        <div class="card p-6"><div class="heading text-lg mb-1" data-i18n="about_c1h">It sounds like Air Serbia</div><div class="text-sm text-muted" data-i18n="about_c1d">Lifelike voice that holds a natural conversation, not a menu read aloud.</div></div>
+        <div class="card p-6"><div class="heading text-lg mb-1" data-i18n="about_c2h">It knows the caller</div><div class="text-sm text-muted" data-i18n="about_c2d">Call-open personalization from your systems, not a cold script.</div></div>
+        <div class="card p-6"><div class="heading text-lg mb-1" data-i18n="about_c3h">It acts, not just answers</div><div class="text-sm text-muted" data-i18n="about_c3d">Real system calls and a clean handoff to a human when it should.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== TAB 6: PRICING ====================== -->
+<section id="pricing" class="bg-navy on-dark">
+  <div class="max-w-7xl mx-auto px-5 py-20 md:py-28">
+    <div class="eyebrow mb-4" style="color:var(--macaw)" data-i18n="price_eyebrow">Pricing</div>
+    <h2 class="heading text-4xl md:text-5xl mb-5" data-i18n="price_h">Priced on the calls you contain, not the seats you fill.</h2>
+    <p class="text-lg max-w-3xl mb-12" style="color:#C7D2E4" data-i18n="price_body">PolyAI is priced around the conversations the agent actually handles, so cost tracks value: every call it contains is a call your team did not have to take. We model your real volumes together. The shapes below are how engagements usually start.</p>
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="card-d p-7"><div class="heading text-xl mb-2" style="color:#fff" data-i18n="tier1h">Pilot</div><div class="text-sm" style="color:#A9B6CC" data-i18n="tier1d">One channel or the after-hours gap. Your four flows, a measured slice of volume, clear success metrics.</div></div>
+      <div class="card-d p-7" style="border-color:var(--macaw)"><div class="heading text-xl mb-2" style="color:#fff" data-i18n="tier2h">Production</div><div class="text-sm" style="color:#A9B6CC" data-i18n="tier2d">Full volume on the contained intents, 99.9% contractual SLA, every conversation analysed.</div></div>
+      <div class="card-d p-7"><div class="heading text-xl mb-2" style="color:#fff" data-i18n="tier3h">Enterprise</div><div class="text-sm" style="color:#A9B6CC" data-i18n="tier3d">Multi-channel, multi-market, more languages as you grow the network, dedicated support.</div></div>
+    </div>
+    <div class="mt-8"><a href="#next" class="btn btn-red px-6 py-3" data-i18n="price_cta">Price it against your real volume</a></div>
+  </div>
+</section>
+
+<!-- ====================== TAB 7: ROLLOUT ====================== -->
+<section id="rollout" class="bg-white">
+  <div class="max-w-7xl mx-auto px-5 py-20 md:py-28">
+    <div class="eyebrow mb-4" data-i18n="roll_eyebrow">Rollout</div>
+    <h2 class="heading text-4xl md:text-5xl mb-12" data-i18n="roll_h">Live in weeks, not quarters. Safe by your standards.</h2>
+    <div class="grid md:grid-cols-3 gap-6 mb-12">
+      <div class="card p-7"><div class="stat text-3xl text-red mb-2">1</div><div class="heading text-lg mb-1" data-i18n="roll1h">Listen to the line</div><div class="text-sm text-muted" data-i18n="roll1d">We map a fortnight of real calls in Serbian and English and agree the four flows to start with.</div></div>
+      <div class="card p-7"><div class="stat text-3xl text-red mb-2">2</div><div class="heading text-lg mb-1" data-i18n="roll2h">Wire the flows</div><div class="text-sm text-muted" data-i18n="roll2d">Built against your real connectors in a sandbox you can call, with your guardrails and escalation rules.</div></div>
+      <div class="card p-7"><div class="stat text-3xl text-red mb-2">3</div><div class="heading text-lg mb-1" data-i18n="roll3h">Go live on a slice</div><div class="text-sm text-muted" data-i18n="roll3d">Start after-hours or on one route, measure containment and CSAT, then widen. Typical deployment 8 to 12 weeks.</div></div>
+    </div>
+    <div class="card-d p-8 bg-navy on-dark">
+      <div class="heading text-2xl mb-5" style="color:#fff" data-i18n="roll_ent_h">Enterprise as standard</div>
+      <div class="grid md:grid-cols-2 gap-x-10 gap-y-3 text-sm" style="color:#C7D2E4">
+        <div data-i18n="roll_e1">130+ pre-built connectors for reservations, CRM, baggage and telephony</div>
+        <div data-i18n="roll_e2">Voice, WhatsApp and webchat, in every language you sell in</div>
+        <div data-i18n="roll_e3">SOC 2, GDPR, PCI DSS and ISO 27001 compliance</div>
+        <div data-i18n="roll_e4">99.9% contractual SLA, four cloud regions, every call analysed</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== TAB 8: WHAT'S NEXT ====================== -->
+<section id="next" class="bg-ground-2">
+  <div class="max-w-7xl mx-auto px-5 py-20 md:py-28 text-center">
+    <div class="eyebrow mb-4" data-i18n="next_eyebrow">What's next</div>
+    <h2 class="heading text-4xl md:text-5xl mb-5 max-w-3xl mx-auto" data-i18n="next_h">We started building it. Come finish it with us.</h2>
+    <p class="text-lg text-muted max-w-2xl mx-auto mb-8" data-i18n="next_body">The agent you just called was assembled in PolyAI Studio, the same builder your team would use. Tone, flows and guardrails are all configurable, with full version history and every conversation analysed. Next, we get your team into the platform, hands-on, building a flow live and wiring your first real system.</p>
+    <a href="mailto:hello@poly.ai?subject=Air%20Serbia%20x%20PolyAI%20working%20session" class="btn btn-red px-8 py-4 text-lg" data-i18n="next_cta">Book the working session</a>
+    <div class="grid sm:grid-cols-3 gap-4 mt-12 max-w-3xl mx-auto text-sm">
+      <div class="card p-5" data-i18n="next1">Build a new flow live</div>
+      <div class="card p-5" data-i18n="next2">Wire one of your real systems</div>
+      <div class="card p-5" data-i18n="next3">Run it against the test suite</div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ====================== FOOTER ====================== -->
+<footer class="bg-navy on-dark border-t" style="border-color:rgba(255,255,255,0.10)">
+  <div class="max-w-7xl mx-auto px-5 py-10 flex flex-col md:flex-row items-center justify-between gap-6">
+    <svg class="logo-as logo-as-d" style="height:28px"><use href="#as-logo"></use></svg>
+    <div class="flex items-center gap-2 text-sm" style="color:#A9B6CC">
+      <span data-i18n="foot_by">Voice AI by</span>
+      <svg style="height:18px;color:#fff"><use href="#polyai-logo"></use></svg>
+    </div>
+  </div>
+  <div class="max-w-7xl mx-auto px-5 pb-10">
+    <p class="text-xs" style="color:#7A89A5" data-i18n="foot_note">A PolyAI demonstration built for Air Serbia. The passenger record shown is illustrative sample data. Case-study metrics are quoted from published PolyAI customer stories. Brand colours and the wordmark are matched from public Air Serbia assets and are not an official brand handover.</p>
+  </div>
+</footer>
+
+<script>
+// ---- Live flight-status lookup (hits our own /api/flight-status) ----
+async function checkFlight() {
+  const el = document.getElementById('fs-result');
+  const fn = (document.getElementById('fs-input').value || '').trim();
+  el.innerHTML = T('fs_checking');
+  try {
+    const r = await fetch('/api/flight-status/' + encodeURIComponent(fn));
+    const d = await r.json();
+    if (d.error) { el.innerHTML = '<span style="color:#FF9AA8">' + d.error + '</span>'; return; }
+    el.innerHTML =
+      '<div style="color:#fff;font-weight:600">' + d.flight_number + ' · ' + d.status + '</div>' +
+      '<div>' + d.departure.airport + ' ' + d.departure.scheduled_local + ' &rarr; ' + d.arrival.airport + ' ' + d.arrival.scheduled_local + '</div>' +
+      '<div style="color:#7A89A5;font-size:11px;margin-top:4px">' + d.source + '</div>';
+  } catch (e) {
+    el.innerHTML = '<span style="color:#FF9AA8">' + T('fs_err') + '</span>';
+  }
+}
+function startCall() {
+  // Placeholder until the Studio agent's web-call widget token is wired in.
+  if (window.PolyphoneAPI && window.PolyphoneAPI.startCall) { window.PolyphoneAPI.startCall(); return; }
+  document.getElementById('call-note').innerHTML = T('agent_call_pending');
+}
+
+// ---- Bilingual (EN / SR-latin) toggle ----
+const DICT = {
+  en: {}, // English is authored inline as the default; SR overrides below.
+  sr: {
+    nav_agent:"Agent", nav_built:"Kako je napravljen", nav_results:"Rezultati", nav_about:"O PolyAI",
+    nav_pricing:"Cene", nav_rollout:"Uvođenje", nav_next:"Sledeći korak", nav_cta:"Razgovaraj sa agentom",
+    marq:"103 destinacije &nbsp;·&nbsp; 4,57M putnika u 2025. &nbsp;·&nbsp; Linija koja odgovara od 06 do 23, na srpskom i engleskom &nbsp;·&nbsp;",
+    hero_eyebrow:"Glasovni AI za Air Serbia",
+    hero_h1a:"Svaki poziv primljen.", hero_h1b:"Na jeziku putnika.",
+    hero_sub:"Kontakt centar Air Serbia prima pozive na srpskom i engleskom, od šest ujutru do jedanaest uveče. Napravili smo glasovnog agenta koji odgovara za manje od tri sekunde, poznaje putnika pre nego što progovori i rešava vaša četiri najčešća razloga poziva od početka do kraja. Menja jezik čim čuje pozivaoca.",
+    hero_cta1:"Razgovaraj sa agentom", hero_cta2:"Pogledaj rezultate",
+    hero_trust:"Napravljeno u PolyAI Studio, uz radni model sistema za rezervacije, prtljag i status letova Air Serbia. Pripremljeno za ovaj razgovor.",
+    hero_card_live:"Živa integracija", hero_card_label:"Proveri pravi let Air Serbia", hero_card_btn:"Proveri",
+    hero_card_note:"Ovo je ista živa pretraga koju agent radi tokom poziva. Probaj JU324, JU500, JU200.",
+    m1n:"Ispod 3 sek", m1l:"do odgovora, svaki poziv, bez čekanja",
+    m2n:"2 jezika", m2l:"srpski i engleski, promena tokom poziva",
+    m3n:"24 / 7", m3l:"i u satima nakon zatvaranja linije",
+    m_cap:"Okvirno, na osnovu onoga što smo videli kod uporedivih operatera. Podaci o obimu iz objavljenih rezultata za 2025.",
+    agent_eyebrow:"Vaš agent, uživo", agent_h:"Već smo napravili vašeg agenta. Pozovite ga.",
+    agent_sub:"Ovo nije video. To je radni PolyAI glasovni agent koji poziva živi model sistema Air Serbia. Pritisnite poziv i pozdraviće putnika po imenu, pročitati rezervaciju i prelaziti između srpskog i engleskog čim čuje pozivaoca.",
+    agent_call:"Započni poziv",
+    agent_call_note:"Vidžet za poziv preko sajta se povezuje kada se Studio agent objavi. Za sada je ovo mesto na koje se ubacuje.",
+    agent_call_pending:"Glasovni agent još nije objavljen. Ovo je lokalna verzija; vidžet se povezuje nakon što se agent napravi u PolyAI Studio.",
+    agent_try_h:"Probaj da kažeš",
+    agent_try1:"„Zdravo, ovde Milan Petrović, zovem zbog leta JU324.“ (pozdravi na srpskom, odgovara na srpskom)",
+    agent_try2:"„Can I add a bag to my booking?“ (pređi na engleski, prati te)",
+    agent_try3:"„Kakav je status leta JU324?“ (radi živu pretragu)",
+    agent_calls_h:"Napravljen za pozive koje vaš tim prima svakog dana",
+    ct1h:"Upravljanje rezervacijom", ct1d:"Promena datuma ili rute, otkazivanje, izbor sedišta, sve nad živom rezervacijom.",
+    ct2h:"Status leta i smetnje", ct2d:"Status u realnom vremenu, kašnjenja i preknjižavanje, iz žive pretrage leta.",
+    ct3h:"Prtljag", ct3d:"Pitanja o dozvoljenom prtljagu, dodatni koferi dodati i potvrđeni odmah.",
+    ct4h:"Prijava i ukrcavanje", ct4d:"Onlajn prijava, karta za ukrcavanje, izlaz i vreme polaska.",
+    agent_also:"Takođe odgovara iz kartona:", agent_also2:"Elevate nivo i milje, pravo na povraćaj i predstojeći let putnika, bez prebacivanja.",
+    step1:"Prepoznao pozivaoca", step2:"Razumeo nameru", step3:"Izvršio i potvrdio",
+    asm_eyebrow:"Kako je ovo napravljeno", asm_h:"Tačno šta je stvarno, a šta smo modelovali.",
+    asm_sub:"Demo treba da bude iskren o svojim šavovima. Evo naših. Sve što ovde nije naznačeno zaista radi.",
+    asm_real_h:"Stvarno danas",
+    asm_real1:"<strong class='text-navy'>Agent i njegovo rezonovanje.</strong> Živi PolyAI glasovni agent, ne skripta.",
+    asm_real2:"<strong class='text-navy'>Promena jezika.</strong> Srpski i engleski, menja se tokom poziva kada čuje pozivaoca.",
+    asm_real3:"<strong class='text-navy'>Pretraga statusa leta.</strong> Pravi poziv ka spoljnom API-ju, isti kao na ovoj stranici.",
+    asm_real4:"<strong class='text-navy'>Personalizacija.</strong> Pozdravlja po imenu i čita rezervaciju iz kartona na početku poziva.",
+    asm_real5:"<strong class='text-navy'>Izrada u Studio.</strong> Sastavljeno u PolyAI Studio, istom alatu koji bi vaš tim koristio.",
+    asm_mock_h:"Modelovano za ovaj demo",
+    asm_mock1:"<strong class='text-navy'>Karton putnika.</strong> Jedan ilustrativni Elevate profil (Milan Petrović, PNR JU8K2P) zamenjuje vaš CRM.",
+    asm_mock2:"<strong class='text-navy'>Upisi rezervacije, prtljaga i prijave.</strong> Potvrđeni u demou, ne upisuju se u živi sistem.",
+    asm_mock3:"<strong class='text-navy'>Oblik API-ja.</strong> Veran model podataka Air Serbia, ne veza sa produkcijom.",
+    asm_mock4:"<strong class='text-navy'>Brend elementi.</strong> Boje i logotip su usklađeni iz javnih Air Serbia materijala; font je blizak besplatan izbor.",
+    asm_why:"<strong class='text-navy'>Zašto je važno.</strong> To je poenta. Radni glasovni agent za Air Serbia, za nekoliko dana, bez rizika po vaše sisteme i bez čekanja na bezbednosnu proveru. Pravi pilot zamenjuje model vašim konektorima, a uzorak vašim podacima. Sve ostalo ostaje kako ste čuli.",
+    proof_eyebrow:"Rezultati", proof_h:"Najteži razgovori, već rešeni.",
+    proof_sub:"PolyAI vodi živu glasovnu komunikaciju za kompanije sa desetinama miliona poziva godišnje. Još nismo objavili studiju za avio-kompaniju, pa su dokazi ispod najbliži rad u putovanjima i vodeća višejezična i visokoobimna rešenja. Svaki broj je preuzet iz objavljene priče o korisniku.",
+    cs1_tag:"Komunalije · dvojezično EN + ES", cs1_s1:"ušteđenih radnih sati", cs1_s2:"zadržavanje", cs1_s3:"porast CSAT", cs1_s4:"manje napora korisnika",
+    cs2_tag:"Putovanja", cs2_s1:"poziva potpuno rešeno", cs2_s2:"uvek dostupno", cs2_d:"FAQ i rutiranje za putničku aplikaciju velikog obima, danonoćno.",
+    cs3_tag:"Bankarstvo · Balkan · višejezično", cs3_s1:"automatizacija poziva", cs3_s2:"brže rutiranje", cs3_s3:"napuštanje", cs3_s4:"NPS",
+    cs3_d:"Rutiranje prirodnim jezikom u regionu, na lokalnom jeziku.",
+    proof_logos_h:"Na telefonima im veruju",
+    about_eyebrow:"O", about_h:"Glasovna platforma kojoj kompanije veruju za najteže pozive.",
+    about_body:"PolyAI pravi glasovne agente koji vode pravi razgovor i obave posao. Kompanije vode svoje telefonske linije na nama, u komunalijama, bankarstvu, putovanjima, ugostiteljstvu i maloprodaji. Agenti rade na Raven modelu, našem glasovnom modelu, treniranom na više od milijardu poslovnih razgovora. Nije čet-bot. Nije glas zalepljen na čet.",
+    about_lang:"Preko 100 jezika na platformi i Raven koji govori 24 i više, pa je linija srpski-engleski početak, a ne granica.",
+    about_c1h:"Zvuči kao Air Serbia", about_c1d:"Životan glas koji vodi prirodan razgovor, ne meni čitan naglas.",
+    about_c2h:"Poznaje pozivaoca", about_c2d:"Personalizacija na početku poziva iz vaših sistema, ne hladna skripta.",
+    about_c3h:"Deluje, ne samo odgovara", about_c3d:"Pravi pozivi sistema i čisto prebacivanje na čoveka kada treba.",
+    price_eyebrow:"Cene", price_h:"Naplata po pozivima koje zadržite, ne po brojem mesta.",
+    price_body:"PolyAI se naplaćuje prema razgovorima koje agent zaista obradi, pa cena prati vrednost: svaki zadržan poziv je poziv koji vaš tim nije morao da primi. Zajedno modelujemo vaše stvarne obime. Oblici ispod su način na koji saradnja obično počinje.",
+    tier1h:"Pilot", tier1d:"Jedan kanal ili sati nakon radnog vremena. Vaša četiri toka, merljiv deo obima, jasni ciljevi.",
+    tier2h:"Produkcija", tier2d:"Pun obim na zadržanim namerama, 99,9% ugovorni SLA, svaki razgovor analiziran.",
+    tier3h:"Enterprajz", tier3d:"Više kanala, više tržišta, više jezika kako mreža raste, posvećena podrška.",
+    price_cta:"Izračunaj cenu za vaš stvarni obim",
+    roll_eyebrow:"Uvođenje", roll_h:"Uživo za nedelje, ne kvartale. Bezbedno po vašim standardima.",
+    roll1h:"Slušaj liniju", roll1d:"Mapiramo dve nedelje stvarnih poziva na srpskom i engleskom i dogovaramo četiri toka za početak.",
+    roll2h:"Poveži tokove", roll2d:"Napravljeno uz vaše prave konektore u okruženju koje možete pozvati, sa vašim pravilima i eskalacijom.",
+    roll3h:"Pusti na deo", roll3d:"Počni nakon radnog vremena ili na jednoj ruti, meri zadržavanje i CSAT, pa proširi. Tipično uvođenje 8 do 12 nedelja.",
+    roll_ent_h:"Enterprajz kao standard",
+    roll_e1:"130+ gotovih konektora za rezervacije, CRM, prtljag i telefoniju",
+    roll_e2:"Glas, WhatsApp i veb-čet, na svakom jeziku na kom prodajete",
+    roll_e3:"SOC 2, GDPR, PCI DSS i ISO 27001 usklađenost",
+    roll_e4:"99,9% ugovorni SLA, četiri klaud regiona, svaki poziv analiziran",
+    next_eyebrow:"Sledeći korak", next_h:"Počeli smo da ga gradimo. Dođite da ga završimo zajedno.",
+    next_body:"Agent koga ste upravo pozvali sastavljen je u PolyAI Studio, istom alatu koji bi vaš tim koristio. Ton, tokovi i pravila su podesivi, sa punom istorijom verzija i svakim analiziranim razgovorom. Sledeće, uvodimo vaš tim u platformu, praktično, gradeći tok uživo i povezujući vaš prvi pravi sistem.",
+    next_cta:"Zakaži radnu sesiju",
+    next1:"Napravi novi tok uživo", next2:"Poveži jedan vaš pravi sistem", next3:"Pokreni nad test paketom",
+    foot_by:"Glasovni AI od",
+    foot_note:"PolyAI demonstracija napravljena za Air Serbia. Prikazani karton putnika je ilustrativni uzorak. Brojevi iz studija slučaja preuzeti su iz objavljenih PolyAI priča o korisnicima. Boje brenda i logotip usklađeni su iz javnih Air Serbia materijala i nisu zvanična predaja brenda.",
+    fs_checking:"Proveravam...", fs_err:"Pretraga trenutno nije dostupna.",
+  }
+};
+// runtime strings used by JS (English defaults)
+const JS_EN = { fs_checking:"Checking...", fs_err:"Lookup unavailable right now.",
+  agent_call_pending:"The voice agent is not published yet. This is the local build; the widget wires in once the agent is created in PolyAI Studio." };
+let LANG = 'en';
+const EN_CACHE = {};
+function T(key){ if(LANG==='sr' && DICT.sr[key]!=null) return DICT.sr[key]; if(JS_EN[key]!=null) return JS_EN[key]; return EN_CACHE[key]||key; }
+function setLang(lang){
+  LANG = lang;
+  document.documentElement.lang = (lang==='sr'?'sr-Latn':'en');
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k = el.getAttribute('data-i18n');
+    if(!(k in EN_CACHE)) EN_CACHE[k] = el.innerHTML; // capture English once
+    if(lang==='sr' && DICT.sr[k]!=null) el.innerHTML = DICT.sr[k];
+    else el.innerHTML = EN_CACHE[k];
+  });
+  document.getElementById('lang-en').style.background = (lang==='en')?'var(--as-navy)':'transparent';
+  document.getElementById('lang-en').style.color = (lang==='en')?'#fff':'var(--as-ink-2)';
+  document.getElementById('lang-sr').style.background = (lang==='sr')?'var(--as-navy)':'transparent';
+  document.getElementById('lang-sr').style.color = (lang==='sr')?'#fff':'var(--as-ink-2)';
+}
+
+// ---- Active-tab underline on scroll ----
+const ids = ['agent','assumptions','proof','about','pricing','rollout','next'];
+const obs = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){
+    document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+    const link = document.querySelector('.nav-tab[href="#'+e.target.id+'"]');
+    if(link) link.classList.add('active');
+  }});
+}, { rootMargin:'-40% 0px -55% 0px' });
+ids.forEach(id=>{ const el=document.getElementById(id); if(el) obs.observe(el); });
+
+// init
+setLang('en');
+</script>
+</body>
+</html>

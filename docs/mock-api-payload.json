@@ -1,0 +1,90 @@
+{
+  "_comment": "Sample payloads returned by the Air Serbia demo API (server.js). Use these to seed Studio connector tests. The passenger lookup returns the same record for any phone so the demo is deterministic.",
+
+  "GET /api/passenger/:phone": {
+    "passenger_id": "JU-7741920",
+    "phone": "+381641234567",
+    "name": "Milan Petrović",
+    "first_name": "Milan",
+    "preferred_language": "sr",
+    "elevate": {
+      "member_id": "EL2207744",
+      "tier": "Silver",
+      "miles_balance": 18450,
+      "miles_to_next_tier": 6550,
+      "next_tier": "Gold"
+    },
+    "upcoming_booking": {
+      "pnr": "JU8K2P",
+      "flight_number": "JU324",
+      "route": "BEG-CDG",
+      "origin": "Belgrade (BEG)",
+      "destination": "Paris Charles de Gaulle (CDG)",
+      "departure_local": "2026-07-03T11:25:00",
+      "arrival_local": "2026-07-03T13:55:00",
+      "status": "On time",
+      "cabin": "Economy",
+      "fare_type": "Standard",
+      "seat": "14C",
+      "checked_bags": 1,
+      "extra_bags_allowed": 2,
+      "checkin_opens_local": "2026-07-02T11:25:00"
+    },
+    "recent_activity": {
+      "last_flight": "JU501 BEG-LHR on 12 May 2026",
+      "disruptions_last_90d": 0
+    },
+    "payment": {
+      "outstanding_balance_eur": 0,
+      "card_on_file": "Visa ****4417"
+    },
+    "eligible_for": ["change_flight", "cancel_refund", "extra_baggage", "seat_selection", "online_checkin", "redeem_miles"]
+  },
+
+  "GET /api/flight-status/JU324 (live, with fallback)": {
+    "flight_number": "JU324",
+    "airline": "Air Serbia",
+    "status": "On time",
+    "departure": { "airport": "Belgrade (BEG)", "scheduled_local": "11:25", "terminal": "2" },
+    "arrival": { "airport": "Paris Charles de Gaulle (CDG)", "scheduled_local": "13:55", "terminal": "2D" },
+    "date": "2026-06-20",
+    "source": "live: AeroDataBox  (or 'sample data (no live flight API key configured)' if no key set)"
+  },
+
+  "POST /api/booking/change": {
+    "request": { "pnr": "JU8K2P", "new_date": "2026-07-05", "new_flight_number": "JU324", "notes": "passenger requested later date" },
+    "response": {
+      "reference": "CHG-1750000000000",
+      "pnr": "JU8K2P",
+      "new_date": "2026-07-05",
+      "new_flight_number": "JU324",
+      "fare_difference_eur": 0,
+      "status": "confirmed",
+      "confirmation_message": "Your flight change is confirmed. A new itinerary will reach you by email and SMS within a few minutes."
+    }
+  },
+
+  "POST /api/baggage/add": {
+    "request": { "pnr": "JU8K2P", "extra_bags": 1 },
+    "response": {
+      "reference": "BAG-1750000000000",
+      "pnr": "JU8K2P",
+      "extra_bags": 1,
+      "price_eur": 35,
+      "status": "confirmed",
+      "confirmation_message": "Added 1 extra bag(s) to your booking. The updated baggage allowance is on your boarding pass."
+    }
+  },
+
+  "POST /api/checkin": {
+    "request": { "pnr": "JU8K2P", "seat": "14C" },
+    "response": {
+      "reference": "CHK-1750000000000",
+      "pnr": "JU8K2P",
+      "seat": "14C",
+      "boarding_pass": "issued",
+      "status": "checked_in",
+      "confirmation_message": "You are checked in. Your mobile boarding pass has been sent to the Air Serbia app and your email."
+    }
+  }
+}

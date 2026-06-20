@@ -1,0 +1,16 @@
+{
+  "name": "air-serbia-demo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PolyAI prospect demo for Air Serbia - branded microsite + mock contact-centre API + live flight-status integration. Bilingual (Serbian / English) voice agent.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
