@@ -50,7 +50,13 @@ def lookup_flight_status(conv: Conversation, flow: Flow):
         conv.state.flight_departure = scheduled
 
     flow.goto_step("Report Flight Status", "found")
-    return "Status leta je uspešno preuzet."
+    return (
+        f"Podaci o letu: ruta {conv.state.flight_route}, "
+        f"status {conv.state.flight_status_result}, "
+        f"planirani polazak {conv.state.flight_departure}, "
+        f"gejt/terminal {conv.state.flight_gate}. "
+        f"Saopšti pozivaocu sve relevantne informacije prirodnim glasovnim odgovorom."
+    )
 
 
 def _fetch_live_flight(flight_number, conv):
