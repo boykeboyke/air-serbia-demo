@@ -1,10 +1,4 @@
 handoffs:
-- name: callback_promise
-  description: Izvini se, obeća povratni poziv i završi poziv
-  is_default: false
-  sip_config:
-    method: bye
-  sip_headers: []
 - name: goodbye
   description: Završi razgovor na ljubazan način
   is_default: true
