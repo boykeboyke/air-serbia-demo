@@ -1,0 +1,15 @@
+name: Flight Status
+enabled: true
+actions: Use {{fn:start_flight_status}} to begin checking flight status.
+content: Er Srbija obavlja letove pod kodom JU. Pozivaocu možemo proveriti status leta u realnom 
+  vremenu uključujući vreme polaska, kašnjenja, informacije o gejtu i detalje rute.
+example_queries:
+- Kakav je status mog leta?
+- Da li let JU601 kasni?
+- Proveri status leta
+- Želim da znam da li moj let kasni
+- U koliko sati poleće JU333?
+- Da li je moj let još uvek po redu?
+- Informacije o letu molim
+- What's the status of my flight?
+- Is flight JU601 on time?

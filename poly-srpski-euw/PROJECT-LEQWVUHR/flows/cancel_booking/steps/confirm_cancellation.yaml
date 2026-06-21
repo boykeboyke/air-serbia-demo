@@ -1,0 +1,18 @@
+step_type: default_step
+name: Confirm Cancellation
+conditions:
+- name: Confirmed
+  condition_type: step_condition
+  description: Caller confirmed they want to cancel the booking
+  child_step: process_cancellation
+  required_entities: []
+- name: Declined
+  condition_type: step_condition
+  description: Caller decided not to cancel, wants to keep the booking
+  child_step: keep_booking
+  required_entities: []
+extracted_entities: []
+prompt: |-
+  Detalji rezervacije i politika povrata su objašnjeni.
+  Pitaj pozivaoca jasno: "Da li ste sigurni da želite da otkažete ovu rezervaciju?"
+  Sačekaj definitivan odgovor da ili ne. Ako nisu sigurni, daj im trenutak ali ne požuruj.

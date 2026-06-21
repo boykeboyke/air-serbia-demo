@@ -1,0 +1,14 @@
+step_type: default_step
+name: Cancellation Complete
+conditions:
+- name: Done
+  condition_type: exit_flow_condition
+  description: The caller acknowledges the cancellation and has no further questions
+  required_entities: []
+extracted_entities: []
+prompt: |-
+  Rezervacija je otkazana. Reci pozivaocu:
+  - Dobiće povrat od {{vrbl:refund_amount}} evra
+  - Povrat će biti obrađen u roku od {{vrbl:refund_timeline}}
+
+  Zatim pitaj da li ima još nešto čime možeš da pomogneš danas.

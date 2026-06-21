@@ -1,0 +1,14 @@
+step_type: default_step
+name: Complaint Logged
+conditions:
+- name: Done
+  condition_type: exit_flow_condition
+  description: The caller acknowledges the complaint reference and has no further questions
+  required_entities: []
+extracted_entities: []
+prompt: |-
+  Pritužba je zabeležena. Reci pozivaocu:
+  - Njihov referentni broj pritužbe je {{vrbl:complaint_reference}}
+  - Tim će se javiti u roku od 48 sati
+
+  Pročitaj referentni broj jasno. Zatim pitaj da li ima još nešto čime možeš da pomogneš.

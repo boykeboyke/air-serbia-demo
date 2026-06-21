@@ -1,0 +1,22 @@
+step_type: default_step
+name: Select Flight
+conditions:
+- name: Flight Selected
+  condition_type: step_condition
+  description: The caller selected one of the offered flights
+  child_step: map_selected_flight
+  required_entities:
+  - selected_flight
+- name: Declined All
+  condition_type: step_condition
+  description: The caller doesn't want any of the offered flights
+  child_step: handle_no_selection
+  required_entities: []
+extracted_entities:
+- selected_flight
+prompt: |-
+  Predstavi dostupne letove pozivaocu prirodno:
+  1. {{vrbl:alt_slot_1}}
+  2. {{vrbl:alt_slot_2}}
+
+  Pitaj koji bi im odgovarao. Ako nijedan ne odgovara, obavesti ih.

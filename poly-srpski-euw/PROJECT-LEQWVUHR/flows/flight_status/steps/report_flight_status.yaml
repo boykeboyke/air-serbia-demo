@@ -1,0 +1,19 @@
+step_type: default_step
+name: Report Flight Status
+conditions:
+- name: Done
+  condition_type: exit_flow_condition
+  description: The caller has received the flight status and has no further questions about this 
+    flight
+  required_entities: []
+extracted_entities: []
+prompt: |-
+  Pročitaj pozivaocu status leta:
+  - Let: {{vrbl:flight_code}}
+  - Ruta: {{vrbl:flight_route}}
+  - Status: {{vrbl:flight_status_result}}
+  - Polazak: {{vrbl:flight_departure}}
+  - Gejt: {{vrbl:flight_gate}}
+
+  Ako let kasni, priznej neprijatnost.
+  Zatim pitaj da li ima još nešto čime možeš da pomogneš.

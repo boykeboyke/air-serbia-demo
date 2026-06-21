@@ -1,0 +1,14 @@
+name: Loyalty Programme
+enabled: true
+actions: Use {{fn:start_loyalty_check}} to check Etihad Guest loyalty status.
+content: Er Srbija je partner sa Etihad Airways programom lojalnosti, Etihad Guest. Članovi zarađuju
+  i koriste milje na Er Srbija letovima. Možemo proveriti nivo članstva i stanje milja.
+example_queries:
+- Želim da proverim svoje milje
+- Koliko imam Etihad Guest milja?
+- Proveri moj status lojalnosti
+- Koji je moj nivo članstva?
+- Etihad Guest program
+- Imam pitanje o miljama
+- I want to check my miles balance
+- What's my loyalty tier?

@@ -1,0 +1,29 @@
+step_type: default_step
+name: Collect Booking Details
+conditions:
+- name: Collected
+  condition_type: step_condition
+  description: All booking details collected
+  child_step: check_availability
+  required_entities:
+  - origin_city
+  - destination_city
+  - travel_date
+  - num_passengers
+extracted_entities:
+- travel_date
+- num_passengers
+- origin_city
+- destination_city
+- fare_preference
+prompt: |-
+  Prikupi detalje rezervacije leta od pozivaoca. Pitaj za:
+  - Grad polaska (odakle lete)
+  - Grad dolaska (kuda lete)
+  - Datum putovanja
+  - Broj putnika
+  - Preferenca klase (ekonomska ili biznis) — ako ne kažu, pretpostavi ekonomsku
+
+  Ako je pozivalac već pomenuo neke od ovih podataka, izvuci ih — ne pitaj ponovo.
+  Pitaj za nedostajuće podatke prirodno, jedan ili dva istovremeno.
+  Današnji datum je {{vrbl:current_date}}.

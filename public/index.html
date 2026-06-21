@@ -71,6 +71,27 @@
     .marquee-track { display:inline-flex; gap:3rem; animation:slide 28s linear infinite; }
     @keyframes slide { from{transform:translateX(0);} to{transform:translateX(-50%);} }
     html { scroll-behavior:smooth; }
+
+    /* ---- Voice Chat UI (elevenlabs_hybrid mode) ---- */
+    .vc-mic-btn {
+      width:56px; height:56px; border-radius:50%; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer; transition:.2s; border:2px solid rgba(255,255,255,0.25);
+      background:rgba(255,255,255,0.1); color:#fff;
+    }
+    .vc-mic-btn:hover { background:rgba(255,255,255,0.2); }
+    .vc-mic-btn:disabled { opacity:.4; cursor:not-allowed; }
+    .vc-recording { background:var(--as-red) !important; border-color:var(--as-red) !important;
+      animation:mic-pulse 1.2s ease-in-out infinite; }
+    @keyframes mic-pulse {
+      0%,100% { box-shadow:0 0 0 0 rgba(200,16,46,0.6); }
+      50% { box-shadow:0 0 0 14px rgba(200,16,46,0); }
+    }
+    .vc-msg-user { background:rgba(255,255,255,0.08); border-radius:8px; padding:6px 10px;
+      color:#C7D2E4; margin-left:15%; font-size:13px; }
+    .vc-msg-agent { background:rgba(217,238,80,0.07); border-radius:8px; padding:6px 10px;
+      color:#fff; margin-right:15%; font-size:13px;
+      border-left:2px solid var(--macaw); }
   </style>
 </head>
 <body>
@@ -177,11 +198,48 @@
         <h2 class="heading text-4xl md:text-5xl mb-5" data-i18n="agent_h">We already drafted your agent. Call it.</h2>
         <p class="text-lg mb-6" style="color:#C7D2E4" data-i18n="agent_sub">This is not a video. It is a working PolyAI voice agent calling a live model of Air Serbia's systems. It answers 24 hours a day with zero hold time. Press call and it greets the passenger by name, reads back their booking, and switches between Serbian and English the moment it hears the caller.</p>
         <div class="card-d p-6 mb-5">
-          <button id="call-btn" onclick="startCall()" class="btn btn-red w-full justify-center py-4 text-lg">
-            <span class="w-2.5 h-2.5 rounded-full pulse-dot" style="background:var(--macaw)"></span>
-            <span data-i18n="agent_call">Start the call</span>
-          </button>
-          <p id="call-note" class="text-xs mt-3" style="color:#8A99B5" data-i18n="agent_call_note">The live web-call widget is wired in once the Studio agent is published. For now this is the placeholder it drops into.</p>
+
+          <!-- polyai_full: widget placeholder (hidden in hybrid mode) -->
+          <div id="vp-polyai">
+            <button id="call-btn" onclick="startCall()" class="btn btn-red w-full justify-center py-4 text-lg">
+              <span class="w-2.5 h-2.5 rounded-full pulse-dot" style="background:var(--macaw)"></span>
+              <span data-i18n="agent_call">Start the call</span>
+            </button>
+            <p id="call-note" class="text-xs mt-3" style="color:#8A99B5" data-i18n="agent_call_note">The live web-call widget is wired in once the Studio agent is published. For now this is the placeholder it drops into.</p>
+          </div>
+
+          <!-- elevenlabs_hybrid: voice chat UI (shown when mode=elevenlabs_hybrid) -->
+          <div id="vp-hybrid" style="display:none">
+
+            <!-- idle: start button -->
+            <div id="vc-idle">
+              <button onclick="vcStart()" class="btn btn-red w-full justify-center py-4 text-lg">
+                <span class="w-2.5 h-2.5 rounded-full pulse-dot" style="background:var(--macaw)"></span>
+                <span>Start conversation</span>
+              </button>
+              <p class="text-xs mt-3" style="color:#8A99B5">Live voice — ElevenLabs STT/TTS + PolyAI Agent</p>
+            </div>
+
+            <!-- active: transcript + mic -->
+            <div id="vc-active" style="display:none">
+              <div id="vc-transcript" class="mb-4 space-y-2" style="max-height:220px;overflow-y:auto"></div>
+              <div class="flex items-center gap-3">
+                <button id="vc-mic-btn" class="vc-mic-btn" onclick="vcToggleRecord()">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                    <line x1="12" y1="19" x2="12" y2="23"/>
+                    <line x1="8" y1="23" x2="16" y2="23"/>
+                  </svg>
+                </button>
+                <div class="flex-1 min-w-0">
+                  <div id="vc-status" class="text-xs" style="color:#A9B6CC">Click mic to speak</div>
+                </div>
+                <button onclick="vcEnd()" class="text-xs px-3 py-1.5 rounded" style="border:1px solid rgba(255,255,255,0.2);color:#A9B6CC;background:transparent;cursor:pointer">End call</button>
+              </div>
+            </div>
+
+          </div>
         </div>
         <div class="card-d p-5">
           <div class="text-sm font-semibold mb-3" style="color:var(--macaw)" data-i18n="agent_try_h">Try saying</div>
@@ -402,10 +460,156 @@ async function checkFlight() {
     el.innerHTML = '<span style="color:#FF9AA8">' + T('fs_err') + '</span>';
   }
 }
+// ---- Chat mode detection + voice chat (elevenlabs_hybrid) ----
+let chatMode = 'polyai_full';
+let vcSession = null;
+let vcRecorder = null;
+let vcRecording = false;
+let vcPlaying = false;
+let vcChunks = [];
+
+async function initVoicePanel() {
+  try {
+    const r = await fetch('/api/chat/mode');
+    chatMode = (await r.json()).mode || 'polyai_full';
+  } catch(e) { chatMode = 'polyai_full'; }
+  if (chatMode === 'elevenlabs_hybrid') {
+    document.getElementById('vp-polyai').style.display = 'none';
+    document.getElementById('vp-hybrid').style.display = '';
+  }
+}
+
 function startCall() {
-  // Placeholder until the Studio agent's web-call widget token is wired in.
+  if (chatMode === 'elevenlabs_hybrid') { vcStart(); return; }
   if (window.PolyphoneAPI && window.PolyphoneAPI.startCall) { window.PolyphoneAPI.startCall(); return; }
   document.getElementById('call-note').innerHTML = T('agent_call_pending');
+}
+
+async function vcStart() {
+  vcSetStatus('Connecting...');
+  try {
+    const lang = (LANG === 'sr') ? 'sr-RS' : 'en-US';
+    const r = await fetch('/api/chat/session', {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ lang })
+    });
+    const d = await r.json();
+    if (d.error) throw new Error(d.error);
+    vcSession = { session_id: d.session_id, lang };
+    vcAddMsg('agent', d.greeting || '');
+    document.getElementById('vc-idle').style.display = 'none';
+    document.getElementById('vc-active').style.display = '';
+    document.getElementById('vc-mic-btn').disabled = true;
+    vcSetStatus('Agent speaking…');
+    if (d.greeting) {
+      try {
+        const tr = await fetch('/api/chat/tts', {
+          method: 'POST', headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ text: d.greeting })
+        });
+        if (tr.ok) {
+          const blob = await tr.blob();
+          const url = URL.createObjectURL(blob);
+          const audio = new Audio(url);
+          audio.onended = () => { URL.revokeObjectURL(url); vcPlaying = false; vcAfterTurn(false); };
+          audio.onerror = () => { vcPlaying = false; vcAfterTurn(false); };
+          vcPlaying = true;
+          audio.play().catch(() => { vcPlaying = false; vcAfterTurn(false); });
+        } else { vcAfterTurn(false); }
+      } catch(e) { vcAfterTurn(false); }
+    } else { vcAfterTurn(false); }
+  } catch(e) { vcSetStatus('Error: ' + e.message); }
+}
+
+async function vcToggleRecord() {
+  if (vcPlaying) return;
+  if (!vcRecording) {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      vcChunks = [];
+      vcRecorder = new MediaRecorder(stream);
+      vcRecorder.ondataavailable = e => { if (e.data.size > 0) vcChunks.push(e.data); };
+      vcRecorder.onstop = vcSendAudio;
+      vcRecorder.start();
+      vcRecording = true;
+      document.getElementById('vc-mic-btn').classList.add('vc-recording');
+      vcSetStatus('Recording… click to send');
+    } catch(e) { vcSetStatus('Mic error: ' + e.message); }
+  } else {
+    vcRecording = false;
+    vcRecorder.stop();
+    vcRecorder.stream.getTracks().forEach(t => t.stop());
+    document.getElementById('vc-mic-btn').classList.remove('vc-recording');
+    document.getElementById('vc-mic-btn').disabled = true;
+    vcSetStatus('Processing…');
+  }
+}
+
+async function vcSendAudio() {
+  const blob = new Blob(vcChunks, { type: 'audio/webm' });
+  try {
+    const r = await fetch('/api/chat/speak', {
+      method: 'POST',
+      headers: { 'content-type': 'audio/webm', 'x-session-id': vcSession.session_id, 'x-lang': vcSession.lang },
+      body: blob
+    });
+    if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.error || r.statusText); }
+    const transcript = r.headers.get('x-transcript') || '';
+    const replyB64   = r.headers.get('x-reply-text') || '';
+    const ended      = r.headers.get('x-session-ended') === '1';
+    if (transcript) vcAddMsg('user', b64utf8(transcript));
+    if (replyB64)   vcAddMsg('agent', b64utf8(replyB64));
+    const audioBlob = await r.blob();
+    if (audioBlob.size > 0) {
+      vcPlaying = true;
+      vcSetStatus('Agent speaking…');
+      const url = URL.createObjectURL(audioBlob);
+      const audio = new Audio(url);
+      audio.onended = () => { URL.revokeObjectURL(url); vcPlaying = false; vcAfterTurn(ended); };
+      audio.onerror = () => { vcPlaying = false; vcAfterTurn(ended); };
+      audio.play().catch(() => { vcPlaying = false; vcAfterTurn(ended); });
+    } else { vcAfterTurn(ended); }
+    if (ended) vcSession = null;
+  } catch(e) {
+    vcSetStatus('Error: ' + e.message);
+    document.getElementById('vc-mic-btn').disabled = false;
+  }
+}
+
+function vcAfterTurn(ended) {
+  const btn = document.getElementById('vc-mic-btn');
+  if (ended) { vcSetStatus('Call ended. Refresh to start again.'); btn.disabled = true; }
+  else { vcSetStatus('Click mic to speak'); btn.disabled = false; }
+}
+
+async function vcEnd() {
+  if (vcSession) {
+    try { await fetch('/api/chat/end', { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({session_id:vcSession.session_id}) }); } catch(e) {}
+    vcSession = null;
+  }
+  if (vcRecording && vcRecorder) { vcRecording = false; vcRecorder.stop(); vcRecorder.stream.getTracks().forEach(t=>t.stop()); }
+  document.getElementById('vc-active').style.display = 'none';
+  document.getElementById('vc-idle').style.display = '';
+  document.getElementById('vc-transcript').innerHTML = '';
+  const btn = document.getElementById('vc-mic-btn');
+  btn.disabled = false; btn.classList.remove('vc-recording');
+}
+
+function b64utf8(b64) {
+  // atob() gives binary bytes; TextDecoder handles multi-byte chars (Cyrillic, etc.)
+  const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+  return new TextDecoder('utf-8').decode(bytes);
+}
+
+function vcSetStatus(msg) { const el=document.getElementById('vc-status'); if(el) el.textContent=msg; }
+function vcAddMsg(role, text) {
+  if (!text) return;
+  const el = document.getElementById('vc-transcript');
+  const div = document.createElement('div');
+  div.className = role === 'user' ? 'vc-msg-user' : 'vc-msg-agent';
+  div.textContent = text;
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
 }
 
 // ---- Bilingual (EN / SR-latin) toggle ----
@@ -527,6 +731,7 @@ ids.forEach(id=>{ const el=document.getElementById(id); if(el) obs.observe(el); 
 
 // init
 setLang('en');
+initVoicePanel();
 </script>
 </body>
 </html>

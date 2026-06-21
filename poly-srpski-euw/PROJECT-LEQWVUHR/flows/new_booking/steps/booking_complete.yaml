@@ -1,0 +1,16 @@
+step_type: default_step
+name: Booking Complete
+conditions:
+- name: Done
+  condition_type: exit_flow_condition
+  description: The caller acknowledges the booking and has no further questions
+  required_entities: []
+extracted_entities: []
+prompt: |-
+  Rezervacija je potvrđena! Reci pozivaocu:
+  - Njihova referentna oznaka rezervacije je {{vrbl:booking_reference}}
+  - Ukupna cena je {{vrbl:booking_total}} evra
+
+  Pročitaj referentnu oznaku jasno, slovo po slovo ako je potrebno.
+  Obavesti ih da će dobiti mejl sa potvrdom.
+  Zatim pitaj da li ima još nešto čime možeš da pomogneš danas.

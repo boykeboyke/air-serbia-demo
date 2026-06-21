@@ -1,0 +1,14 @@
+step_type: default_step
+name: Collect Flight Number
+conditions:
+- name: Collected
+  condition_type: step_condition
+  description: Flight number collected
+  child_step: lookup_flight_status
+  required_entities:
+  - flight_number
+extracted_entities:
+- flight_number
+prompt: |-
+  Zamoli pozivaoca za broj leta Er Srbije (npr. JU i zatim cifre).
+  Ako je pozivalac već pomenuo broj leta, izvuci ga — ne pitaj ponovo.

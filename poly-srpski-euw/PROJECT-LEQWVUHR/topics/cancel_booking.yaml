@@ -1,0 +1,13 @@
+name: Cancel Booking
+enabled: true
+actions: Use {{fn:start_cancel_booking}} to begin the cancellation process.
+content: Pozivaocu možemo otkazati postojeću rezervaciju na osnovu referentne oznake. Agent čita 
+  detalje rezervacije, objašnjava politiku povrata i traži potvrdu pre otkazivanja.
+example_queries:
+- Želim da otkažem svoj let
+- Mogu li da otkažem rezervaciju?
+- Otkazivanje leta
+- Hoću da otkažem putovanje
+- Kako da otkažem kartu?
+- I want to cancel my flight
+- Cancel my booking please

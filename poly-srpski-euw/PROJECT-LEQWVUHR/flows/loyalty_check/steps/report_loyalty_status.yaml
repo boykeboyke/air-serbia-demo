@@ -1,0 +1,15 @@
+step_type: default_step
+name: Report Loyalty Status
+conditions:
+- name: Done
+  condition_type: exit_flow_condition
+  description: The caller has received their loyalty status and has no further questions
+  required_entities: []
+extracted_entities: []
+prompt: |-
+  Pročitaj pozivaocu njihov Etihad Guest status lojalnosti:
+  - Nivo članstva: {{vrbl:loyalty_tier}}
+  - Stanje milja: {{vrbl:loyalty_miles}}
+  - Datum isteka milja: {{vrbl:loyalty_expiry}}
+
+  Zatim pitaj da li ima još nešto čime možeš da pomogneš danas.

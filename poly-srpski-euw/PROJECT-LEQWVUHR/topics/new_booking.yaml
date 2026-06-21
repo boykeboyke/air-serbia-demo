@@ -1,0 +1,14 @@
+name: New Booking
+enabled: true
+actions: Use {{fn:start_new_booking}} to begin the booking process.
+content: Pozivaocu možemo rezervisati novi let. Prikupljamo rutu, datum putovanja, broj putnika i 
+  preferencu klase (ekonomska ili biznis), pretražujemo dostupne letove i potvrđujemo rezervaciju.
+example_queries:
+- Želim da rezervišem let
+- Mogu li da kupim kartu?
+- Hoću da letim za Pariz
+- Rezervacija novog leta
+- Koliko košta let za London?
+- Ima li letova za Amsterdam sutra?
+- I'd like to book a flight
+- How much is a ticket to Paris?

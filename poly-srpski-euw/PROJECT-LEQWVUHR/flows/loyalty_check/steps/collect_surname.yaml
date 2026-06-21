@@ -1,0 +1,14 @@
+step_type: default_step
+name: Collect Surname
+conditions:
+- name: Collected
+  condition_type: step_condition
+  description: Surname collected
+  child_step: verify_loyalty_member
+  required_entities:
+  - member_surname
+extracted_entities:
+- member_surname
+prompt: |-
+  Zamoli pozivaoca za njihovo prezime radi potvrde identiteta.
+  Ako je pozivalac već pomenuo prezime, izvuci ga — ne pitaj ponovo.

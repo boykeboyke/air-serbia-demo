@@ -1,0 +1,28 @@
+step_type: default_step
+name: Present Booking Actions
+conditions:
+- name: Change Flight
+  condition_type: step_condition
+  description: Caller wants to change or modify their flight
+  child_step: escalate_complex_change
+  required_entities: []
+- name: Cancel Booking
+  condition_type: step_condition
+  description: Caller wants to cancel the booking
+  child_step: route_to_cancel
+  required_entities: []
+- name: Nothing Else
+  condition_type: exit_flow_condition
+  description: Caller doesn't need anything else, they just wanted to check the booking
+  required_entities: []
+extracted_entities: []
+prompt: |-
+  Prvo pročitaj pozivaocu detalje rezervacije:
+  - Putnik: {{vrbl:booking_passenger_name}}
+  - Ruta: {{vrbl:booking_route}}
+  - Datum: {{vrbl:booking_date}}
+  - Broj putnika: {{vrbl:booking_passengers}}
+  - Klasa karte: {{vrbl:booking_fare_class}}
+
+  Zatim pitaj šta žele da urade — mogu da promene let, otkažu rezervaciju, ili da te obaveste ako je to sve.
+  Drži razgovor prirodnim.

@@ -1,0 +1,23 @@
+name: Baggage Allowance
+enabled: true
+actions: Ako pozivalac želi da DODA dodatni prtljag na postojeću rezervaciju (ne samo da pita o 
+  dozvoljenom prtljagu), koristi {{fn:start_add_baggage}}.
+content: |-
+  Ručni prtljag: 1 komad do 8kg, maksimalne dimenzije 55x40x20cm, plus 1 lični predmet (tašna, torba za laptop).
+
+  Predati prtljag ekonomska klasa: 1 komad do 23kg uključen u cenu karte (Ekonom Standard i Ekonom Flex). Ekonom Light nema uključen predati prtljag.
+
+  Predati prtljag biznis klasa: 2 komada po 32kg uključena.
+
+  Dodatni prtljag: može se kupiti online ili na aerodromu. Cene variraju u zavisnosti od destinacije.
+
+  Specijalni prtljag (sportska oprema, muzički instrumenti): prihvata se uz doplatu. Kontaktirati Er Srbiju unapred za detalje.
+example_queries:
+- Koliko prtljaga mogu da ponesem?
+- Koja je dozvoljena težina prtljaga?
+- Da li imam uključen prtljag?
+- Koliko košta dodatni kofer?
+- Dimenzije ručnog prtljaga
+- Mogu li da ponesem gitaru u avion?
+- What's my baggage allowance?
+- How much luggage can I bring?

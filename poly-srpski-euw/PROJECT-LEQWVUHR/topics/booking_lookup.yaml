@@ -1,0 +1,13 @@
+name: Booking Lookup
+enabled: true
+actions: Use {{fn:start_booking_lookup}} to begin looking up a booking.
+content: Pozivaocu možemo pronaći postojeću rezervaciju na osnovu šestocifrene referentne oznake 
+  (PNR). Agent čita detalje rezervacije i nudi opcije za promenu ili otkazivanje.
+example_queries:
+- Želim da proverim svoju rezervaciju
+- Mogu li da pogledam detalje mog leta?
+- Imam referentnu oznaku ABC123
+- Proveri moju rezervaciju
+- Koji su detalji moje rezervacije?
+- I'd like to check my booking
+- Can I look up my reservation?

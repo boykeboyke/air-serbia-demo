@@ -1,0 +1,3 @@
+name: loyalty_check
+description: Verify Etihad Guest member and read back tier status and miles balance
+start_step: Collect Etihad Guest Number

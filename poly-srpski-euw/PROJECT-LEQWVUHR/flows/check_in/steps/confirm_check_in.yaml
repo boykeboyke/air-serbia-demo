@@ -1,0 +1,18 @@
+step_type: default_step
+name: Confirm Check In
+conditions:
+- name: Confirmed
+  condition_type: step_condition
+  description: Caller confirmed they want to check in
+  child_step: execute_check_in
+  required_entities: []
+- name: Declined
+  condition_type: step_condition
+  description: Caller declined check-in
+  child_step: decline_check_in
+  required_entities: []
+extracted_entities: []
+prompt: |-
+  Potvrdi sa pozivaocem: "Prijaviti vas za let {{vrbl:checkin_flight}} dana {{vrbl:checkin_date}}? Da li da nastavim?"
+  Sačekaj jasan da ili ne odgovor.
+  NE objavljuj da je prijavljivanje završeno — to je sledeći korak.

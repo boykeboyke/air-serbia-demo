@@ -1,0 +1,24 @@
+name: Special Assistance
+enabled: true
+actions: Use {{fn:handoff}} with reason "SPECIAL_ASSISTANCE" to transfer to a specialist.
+content: |-
+  Er Srbija pruža posebnu pomoć za putnike sa smanjenom pokretljivošću, medicinskim stanjima i decu koja putuju bez pratnje.
+
+  Pomoć na aerodromu: invalidska kolica, pomoć pri ukrcavanju, prioritetno ukrcavanje.
+
+  Putnici sa medicinskim potrebama treba da kontaktiraju Er Srbiju najmanje 48 sati pre leta.
+
+  Deca bez pratnje (5-12 godina): prihvataju se uz posebnu uslugu pratnje. Naplaćuje se dodatna naknada.
+
+  Psi vodiči i emocionalni psi za podršku: prihvataju se u kabini uz prethodnu najavu.
+
+  Za sva pitanja o posebnoj pomoći, povezujemo vas sa specijalistom.
+example_queries:
+- Trebam invalidska kolica na aerodromu
+- Putuje mi dete samo
+- Da li prihvatate pse vodiče?
+- Imam medicinski problem, šta da radim?
+- Posebna pomoć na letu
+- Moj otac koristi kolica, kako da se ukrca?
+- I need wheelchair assistance
+- Unaccompanied minor travel

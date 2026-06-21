@@ -1,0 +1,20 @@
+name: Destinations and Routes
+enabled: true
+actions: ''
+content: |-
+  Er Srbija leti iz svog čvorišta na aerodromu Nikola Tesla u Beogradu (BEG) sa direktnim letovima do destinacija širom Evrope, Bliskog istoka i severne Afrike.
+
+  Popularne destinacije: London (LHR), Pariz (CDG), Amsterdam (AMS), Frankfurt (FRA), Cirih (ZRH), Rim (FCO), Atina (ATH), Istanbul (IST), Abu Dabi (AUH), Njujork (JFK).
+
+  Sezonske destinacije: Tivat, Podgorica, Ohrid, Tirna, Solun i mnoge druge tokom leta.
+
+  Code-share partneri: Etihad Airways, Air France, Alitalia i drugi. Rezervacije sa presedanjem dostupne preko naše mreže partnera.
+example_queries:
+- Gde Er Srbija leti?
+- Da li imate direktan let za London?
+- Koje su vaše destinacije?
+- Da li letite za Njujork?
+- Letovi iz Beograda
+- Kuda mogu da letim direktno?
+- Where does Air Serbia fly?
+- Do you have direct flights to Paris?

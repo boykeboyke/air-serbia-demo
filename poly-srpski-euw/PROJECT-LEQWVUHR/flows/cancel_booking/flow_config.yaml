@@ -1,0 +1,3 @@
+name: cancel_booking
+description: Cancel an existing booking and process refund
+start_step: Collect Cancel Reference

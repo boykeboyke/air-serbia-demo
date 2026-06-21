@@ -1,0 +1,3 @@
+name: booking_lookup
+description: Look up an existing booking by PNR reference
+start_step: Collect Booking Reference

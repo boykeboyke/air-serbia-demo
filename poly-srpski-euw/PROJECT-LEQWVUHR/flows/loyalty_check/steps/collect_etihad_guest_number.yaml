@@ -1,0 +1,14 @@
+step_type: default_step
+name: Collect Etihad Guest Number
+conditions:
+- name: Collected
+  condition_type: step_condition
+  description: Etihad Guest number collected
+  child_step: Collect Surname
+  required_entities:
+  - etihad_guest_number
+extracted_entities:
+- etihad_guest_number
+prompt: |-
+  Zamoli pozivaoca za njihov broj članstva u Etihad Guest programu.
+  Ako ga je pozivalac već pomenuo, izvuci ga — ne pitaj ponovo.

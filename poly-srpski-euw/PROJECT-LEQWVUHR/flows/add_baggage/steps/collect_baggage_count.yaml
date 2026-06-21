@@ -1,0 +1,14 @@
+step_type: default_step
+name: Collect Baggage Count
+conditions:
+- name: Collected
+  condition_type: step_condition
+  description: Number of extra bags collected
+  child_step: Confirm Baggage
+  required_entities:
+  - baggage_count
+extracted_entities:
+- baggage_count
+prompt: |-
+  Pitaj pozivaoca koliko dodatnih kofera želi da doda na rezervaciju (od 1 do 5).
+  Ako je pozivalac već pomenuo broj ranije, preuzmi ga.

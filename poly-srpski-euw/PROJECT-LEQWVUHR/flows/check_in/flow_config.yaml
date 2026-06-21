@@ -1,0 +1,3 @@
+name: check_in
+description: Allows callers to check in for their flight by phone
+start_step: Collect Booking Reference For Check In

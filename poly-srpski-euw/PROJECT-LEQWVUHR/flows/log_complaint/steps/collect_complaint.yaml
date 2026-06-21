@@ -1,0 +1,15 @@
+step_type: default_step
+name: Collect Complaint
+conditions:
+- name: Collected
+  condition_type: step_condition
+  description: Complaint description collected
+  child_step: submit_complaint
+  required_entities:
+  - complaint_description
+extracted_entities:
+- complaint_description
+prompt: |-
+  Zamoli pozivaoca da opiše svoju pritužbu ili povratnu informaciju svojim rečima.
+  Slušaj strpljivo i zabeleži sve što kažu. Ako su već počeli da opisuju
+  problem, izvuci to — ne traži da ponavljaju.

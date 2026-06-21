@@ -1,0 +1,14 @@
+step_type: default_step
+name: Collect Cancel Reference
+conditions:
+- name: Collected
+  condition_type: step_condition
+  description: Booking reference collected
+  child_step: lookup_for_cancel
+  required_entities:
+  - booking_reference
+extracted_entities:
+- booking_reference
+prompt: |-
+  Zamoli pozivaoca za šestocifrenu referentnu oznaku rezervacije da nastaviš sa otkazivanjem.
+  Ako je pozivalac već pomenuo referentnu oznaku, izvuci je — ne pitaj ponovo.

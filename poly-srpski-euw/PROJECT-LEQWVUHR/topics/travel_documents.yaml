@@ -1,0 +1,22 @@
+name: Travel Documents
+enabled: true
+actions: ''
+content: |-
+  Svi putnici moraju imati važeći pasoš za međunarodna putovanja. Neke destinacije zahtevaju vizu — zahtevi variraju u zavisnosti od državljanstva i destinacije.
+
+  Letovi unutar Evrope (Šengen zona): za državljane Srbije potreban je pasoš. Za državljane EU dovoljna je lična karta.
+
+  Letovi van Evrope: potreban je pasoš sa važnošću najmanje 6 meseci nakon datuma putovanja.
+
+  Vize: Proverite zahteve za vizu kod ambasade destinacije. Er Srbija ne može da garantuje ukrcavanje bez potrebnih dokumenata.
+
+  Preporučujemo da proverite zahteve za dokumenta najmanje 2 nedelje pre putovanja.
+example_queries:
+- Koja dokumenta su mi potrebna za let?
+- Da li mi treba viza za London?
+- Šta ako mi je istekao pasoš?
+- Koji dokumenti za let unutar Evrope?
+- Treba li mi pasoš za Crnu Goru?
+- Putna dokumenta
+- What documents do I need?
+- Do I need a visa?

@@ -1,0 +1,74 @@
+entities:
+- name: flight_number
+  description: Air Serbia flight number e.g. JU601
+  entity_type: alphanumeric
+  config:
+    enabled: true
+    validation_type: ''
+    regular_expression: ^[A-Za-z]{2}[0-9]{1,4}$
+- name: booking_reference
+  description: 6-character PNR booking reference
+  entity_type: alphanumeric
+  config:
+    enabled: true
+    validation_type: ''
+    regular_expression: ^[A-Za-z0-9]{6}$
+- name: origin_city
+  description: Departure city or airport
+  entity_type: free_text
+  config: {}
+- name: destination_city
+  description: Arrival city or airport
+  entity_type: free_text
+  config: {}
+- name: travel_date
+  description: Preferred travel date
+  entity_type: date
+  config:
+    relative_date: false
+- name: num_passengers
+  description: Number of passengers
+  entity_type: numeric
+  config:
+    has_decimal: false
+    has_range: false
+    min: 1
+    max: 9
+- name: fare_preference
+  description: Fare class preference
+  entity_type: enum
+  config:
+    options:
+    - economy
+    - business
+- name: selected_flight
+  description: Caller's flight selection from presented options
+  entity_type: enum
+  config:
+    options:
+    - slot_1
+    - slot_2
+    - slot_3
+- name: etihad_guest_number
+  description: Etihad Guest loyalty programme number
+  entity_type: alphanumeric
+  config:
+    enabled: true
+    validation_type: ''
+    regular_expression: ^[A-Za-z0-9]+$
+- name: member_surname
+  description: Surname for loyalty member verification
+  entity_type: name_config
+  config: {}
+- name: complaint_description
+  description: Caller's complaint or feedback in their own words
+  entity_type: free_text
+  config: {}
+- name: baggage_count
+  description: Number of extra bags to add (1-5)
+  entity_type: numeric
+  config:
+    has_decimal: false
+    has_range: false
+    min: 1
+    max: 5

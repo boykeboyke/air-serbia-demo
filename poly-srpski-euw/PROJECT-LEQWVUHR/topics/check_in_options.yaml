@@ -1,0 +1,21 @@
+name: Check In Options
+enabled: true
+actions: Ako pozivalac želi da se PRIJAVI za let (ne samo da pita o opcijama prijavljivanja), 
+  koristi {{fn:start_check_in}}.
+content: |-
+  Onlajn prijavljivanje: Otvara se 36 sati pre polaska i zatvara se 1 sat pre polaska. Dostupno preko Er Srbija sajta ili mobilne aplikacije.
+
+  Prijavljivanje na aerodromu: Šalteri se otvaraju 3 sata pre polaska za međunarodne letove i 2 sata za domaće. Zatvaraju se 45 minuta pre polaska.
+
+  Samouslužni kiosci: Dostupni na aerodromu Nikola Tesla u Beogradu.
+
+  Dokumenta potrebna za prijavljivanje: pasoš ili lična karta (za letove unutar Evrope), kartu za ukrcavanje (digitalnu ili štampanu).
+example_queries:
+- Kako da se prijavim za let?
+- Kada se otvara onlajn check-in?
+- Gde mogu da se prijavim na aerodromu?
+- Do kada mogu da se prijavim?
+- Da li mogu da se prijavim preko telefona?
+- Prijavljivanje na let
+- How do I check in?
+- When does online check-in open?

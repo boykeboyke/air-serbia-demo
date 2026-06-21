@@ -1,0 +1,14 @@
+name: Complaints and Feedback
+enabled: true
+actions: Use {{fn:start_log_complaint}} to log a complaint.
+content: Er Srbija ozbiljno shvata sve povratne informacije. Pritužbe se beleže sa referentnim 
+  brojem i tim se javlja u roku od 48 sati.
+example_queries:
+- Želim da podnesem pritužbu
+- Imam žalbu
+- Moj let je kasnio i želim da se žalim
+- Kako da podnesem reklamaciju?
+- Nisam zadovoljan uslugom
+- Želim da ostavim povratnu informaciju
+- I want to make a complaint
+- I'd like to file feedback

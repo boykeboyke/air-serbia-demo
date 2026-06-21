@@ -1,0 +1,30 @@
+api_integrations:
+- name: air_serbia_api
+  description: Air Serbia demo backend for passenger, flight, booking, baggage, and check-in 
+    operations
+  environments:
+    sandbox:
+      base_url: https://air-serbia-demo-production.up.railway.app
+      auth_type: none
+    pre-release:
+      base_url: https://air-serbia-demo-production.up.railway.app
+      auth_type: none
+    live:
+      base_url: https://air-serbia-demo-production.up.railway.app
+      auth_type: none
+  operations:
+  - name: lookup_passenger
+    method: GET
+    resource: /api/passenger/{phone}
+  - name: get_flight_status
+    method: GET
+    resource: /api/flight-status/{flight_number}
+  - name: change_booking
+    method: POST
+    resource: /api/booking/change
+  - name: add_baggage
+    method: POST
+    resource: /api/baggage/add
+  - name: check_in
+    method: POST
+    resource: /api/checkin

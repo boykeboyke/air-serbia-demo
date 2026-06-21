@@ -1,0 +1,18 @@
+step_type: default_step
+name: Confirm Baggage
+conditions:
+- name: Confirmed
+  condition_type: step_condition
+  description: Caller confirmed they want to add the baggage
+  child_step: execute_add_baggage
+  required_entities: []
+- name: Declined
+  condition_type: step_condition
+  description: Caller declined or changed their mind
+  child_step: decline_baggage
+  required_entities: []
+extracted_entities: []
+prompt: |-
+  Potvrdi sa pozivaocem: "Dodajem {{entity:baggage_count}} dodatni/a kofer(a) na rezervaciju {{entity:booking_reference}} ({{vrbl:baggage_route}}, {{vrbl:baggage_date}}). Da li je to u redu?"
+  Sačekaj jasan da ili ne odgovor. Ako je pozivalac neodlučan, pitaj ponovo jasno.
+  NE objavljuj da je prtljag dodat — to je sledeći korak.

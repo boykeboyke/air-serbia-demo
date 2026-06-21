@@ -1,0 +1,3 @@
+name: flight_status
+description: Check real-time flight status by flight number
+start_step: Collect Flight Number

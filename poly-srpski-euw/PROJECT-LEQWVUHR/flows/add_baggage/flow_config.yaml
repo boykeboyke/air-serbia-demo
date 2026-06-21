@@ -1,0 +1,3 @@
+name: add_baggage
+description: Allows callers to add extra checked baggage to an existing booking
+start_step: Collect Booking Reference For Baggage
