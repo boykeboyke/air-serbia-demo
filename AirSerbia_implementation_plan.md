@@ -1,6 +1,6 @@
 # Air Serbia x PolyAI — Implementation Plan
 
-_Last updated: 2026-06-20_
+_Last updated: 2026-06-21_
 _GitHub: https://github.com/boykeboyke/air-serbia-demo_
 _Railway: https://air-serbia-demo-production.up.railway.app_
 _Studio: https://studio.eu.poly.ai/poly-srpski-euw/PROJECT-LEQWVUHR_
@@ -9,9 +9,13 @@ _Studio: https://studio.eu.poly.ai/poly-srpski-euw/PROJECT-LEQWVUHR_
 
 ## How the system works (summary)
 
-A passenger calls in → PolyAI Studio's voice agent answers in Serbian or English → the agent calls the Railway server via HTTP connectors to look up the passenger and perform actions → the Railway server proxies live data (flight status via AviationStack) or returns mock data for everything else. The same Railway server also hosts the branded microsite a prospect views in a browser.
+Two chat modes controlled by `CHAT_MODE` env var:
 
-See `architecture diagram` in the README or the diagram in the conversation.
+**`polyai_full`** — PolyAI voice widget handles everything (speech-to-speech). Widget dropped into the "The Agent" tab once Studio agent is published.
+
+**`elevenlabs_hybrid`** (currently active) — Browser mic → ElevenLabs STT → PolyAI Chat API (text-to-text, `tts_lang_code: sr-RS` forces Serbian) → ElevenLabs TTS → audio playback. Transcript shown in UI. Session managed server-side with 1-hour TTL.
+
+The Railway server also hosts the branded microsite and proxies live flight data (AviationStack).
 
 ---
 
@@ -68,23 +72,51 @@ See `architecture diagram` in the README or the diagram in the conversation.
 
 ---
 
-## Phase 4 — Studio voice agent 🔲 IN PROGRESS
+## Phase 4 — ElevenLabs hybrid voice chat ✅ COMPLETE
+
+| Task | Status | Notes |
+|---|---|---|
+| `CHAT_MODE` feature flag | ✅ | `polyai_full` (default) vs `elevenlabs_hybrid` |
+| ElevenLabs STT (Scribe v1) | ✅ | Multipart audio upload, `ELEVENLABS_STT_LANG=sr` |
+| PolyAI Chat API integration | ✅ | `tts_lang_code: sr-RS` forces Serbian text responses |
+| ElevenLabs TTS | ✅ | Voice `peXmQaCErbfrWCM5FqjH`, eleven_multilingual_v2 |
+| Server-side session store | ✅ | In-memory Map, 1-hour TTL |
+| Greeting spoken aloud on start | ✅ | `/api/chat/tts` endpoint, plays before mic unlocks |
+| Voice chat UI (mic button) | ✅ | Push-to-talk, transcript panel, end call button |
+| UTF-8 / Cyrillic transcript fix | ✅ | `b64utf8()` via TextDecoder — no more garbled chars |
+| `vcPlaying` state reset fix | ✅ | Mic re-enables after greeting finishes |
+| All Studio function steps in Serbian | ✅ | No English strings fed to LLM (eliminates language drift) |
+| Deployed to Railway (hybrid mode) | ✅ | `CHAT_MODE=elevenlabs_hybrid` set as Railway env var |
+| All secrets set on Railway | ✅ | `POLY_ADK_KEY`, `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_ID` |
+
+### New API routes (server.js)
+
+| Route | Purpose |
+|---|---|
+| `GET /api/chat/mode` | Returns current `CHAT_MODE` |
+| `POST /api/chat/session` | Creates PolyAI session, returns greeting |
+| `POST /api/chat/message` | Text in → Serbian text reply |
+| `POST /api/chat/tts` | Text → MP3 (speaks greeting) |
+| `POST /api/chat/speak` | Audio in → ElevenLabs STT → PolyAI → ElevenLabs TTS → MP3 out |
+| `POST /api/chat/end` | Closes PolyAI session |
+
+---
+
+## Phase 5 — PolyAI Studio agent (ADK) ✅ MOSTLY COMPLETE
 
 | Task | Status | Notes |
 |---|---|---|
 | Studio project created | ✅ | PROJECT-LEQWVUHR, euw-1 cluster |
-| Flows built in Studio UI | ✅ | User built manually |
-| `system-prompt.md` written | ✅ | Bilingual, call-open personalization, 4 flows |
-| `builder-agent-prompt.md` written | ✅ | Reference doc (not needed since flows built manually) |
+| Flows built in Studio UI | ✅ | 8 flows: flight status, booking lookup, new booking, cancel, baggage, check-in, loyalty, complaint |
+| ADK CLI access | ✅ | `~/.polyai-venv/bin/adk`, key in `~/.config/claude/secrets.env` |
+| ADK project pulled & tracked in Git | ✅ | `poly-srpski-euw/PROJECT-LEQWVUHR/` |
+| Serbian rules + personality | ✅ | `rules.txt`, `personality.yaml` — all in Serbian |
+| `default_language: sr-RS` | ✅ | `agent_settings/languages.yaml` |
+| All function steps in Serbian | ✅ | State vars and return strings — no English LLM context |
+| ADK branch pushed | ✅ | Branch `ADK-49236-af16` — **merge in Studio UI to activate** |
 | **Wire HTTP connectors in Studio UI** | 🔲 | 5 endpoints — see table below |
-| Build `start_function` | 🔲 | Call-open passenger lookup → `conv.state` |
-| Build `set_caller_language()` | 🔲 | `conv.set_language("sr-RS"/"en-US")` |
-| Populate `# PASSENGER CONTEXT` in agent prompt | 🔲 | Inject `conv.state` fields so agent answers from record |
-| Test: Serbian greeting by name | 🔲 | Agent greets "Milan" in Serbian on call-open |
-| Test: live flight status lookup | 🔲 | Agent calls `/api/flight-status/JU500`, reads back live data |
-| Test: bilingual switch mid-call | 🔲 | Open in SR, switch to EN, agent follows |
-| Test: safety/emergency routing | 🔲 | Must transfer to human, 100% of the time |
-| Tune voice (speed 1.2, stability low) | 🔲 | Studio: Channels → Agent voice → gear |
+| Test: live flight status via connector | 🔲 | After connectors wired |
+| Merge ADK branch in Studio | 🔲 | Studio → Branches → merge `ADK-49236-af16` into main |
 
 ### HTTP connectors to wire in Studio UI (⚠️ UI-only — ADK cannot do this)
 
@@ -98,17 +130,18 @@ See `architecture diagram` in the README or the diagram in the conversation.
 
 ---
 
-## Phase 5 — Widget + adversarial iteration 🔲
+## Phase 6 — PolyAI widget (polyai_full mode) 🔲
 
 | Task | Status | Notes |
 |---|---|---|
+| Merge ADK branch in Studio | 🔲 | Prerequisite for everything below |
+| Wire HTTP connectors (5 endpoints) | 🔲 | Studio UI only |
 | Deploy agent to Sandbox environment | 🔲 | Required before widget token can be minted |
-| Publish web-call widget | 🔲 | Studio: Channels → Widgets → + Widget → Web calling. Website URL = `https://air-serbia-demo-production.up.railway.app` |
-| Wire widget `<script>` into `public/index.html` | 🔲 | Replace the placeholder comment in "Your Agent" tab |
-| Redeploy Railway with widget script | 🔲 | `railway up --detach` from `air-serbia-demo/` |
-| Verify bubble renders on live site | 🔲 | `window.PolyphoneAPI` should be defined on page load |
+| Publish web-call widget | 🔲 | Studio: Channels → Widgets → + Widget → Web calling |
+| Wire widget `<script>` into `public/index.html` | 🔲 | Replace placeholder in "The Agent" tab |
+| Redeploy Railway with widget script | 🔲 | `railway up --service air-serbia-demo --detach` |
+| Set `CHAT_MODE=polyai_full` on Railway | 🔲 | Switches from hybrid to PolyAI full speech |
 | Run adversarial critic loop | 🔲 | See `reference/adversarial-iteration.md` |
-| Agent reaches L3+ (grows revenue, not just answers) | 🔲 | Upsell ancillaries, proactive Elevate upgrade nudge |
 
 ---
 
@@ -120,8 +153,8 @@ See `architecture diagram` in the README or the diagram in the conversation.
 | Booking change / cancel | 🔶 Mock | Amadeus NDC or Air Serbia's booking API |
 | Baggage add | 🔶 Mock | Air Serbia's ancillary/extras API |
 | Check-in | 🔶 Mock | Departure control system (DCS) connector |
-| Flight status | ✅ Live | AviationStack (already wired) |
-| Elevate miles / tier | 🔶 Mock | Air Serbia's new Elevate program API |
+| Flight status | ✅ Live | AviationStack (wired in both local + Railway) |
+| Elevate miles / tier | 🔶 Mock | Air Serbia's Elevate program API |
 
 ---
 
@@ -133,16 +166,19 @@ export NVM_DIR="$HOME/.nvm"; . "$NVM_DIR/nvm.sh"
 cd air-serbia-demo && npm start          # → http://localhost:3000
 
 # Redeploy to Railway
-export NVM_DIR="$HOME/.nvm"; . "$NVM_DIR/nvm.sh"
-cd air-serbia-demo && railway up --detach
+railway up --service air-serbia-demo --detach
 
 # Test production endpoints
 curl https://air-serbia-demo-production.up.railway.app/healthz
+curl https://air-serbia-demo-production.up.railway.app/api/chat/mode
 curl https://air-serbia-demo-production.up.railway.app/api/flight-status/JU500
-curl https://air-serbia-demo-production.up.railway.app/api/passenger/any
 
 # Push to GitHub
 export PATH="$HOME/bin:$PATH"
-cd air-serbia-demo
 git add -A && git -c commit.gpgsign=false commit -m "your message" && git push
+
+# Push to PolyAI Studio (from project subfolder)
+cd poly-srpski-euw/PROJECT-LEQWVUHR
+source ~/.config/claude/secrets.env && export POLY_ADK_KEY
+~/.polyai-venv/bin/adk push
 ```
