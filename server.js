@@ -203,21 +203,24 @@ async function polyaiEndSession(conversation_id) {
 // CHAT MODE — ELEVENLABS STT + TTS
 // ════════════════════════════════════════════════════════════════════════════
 
-// ElevenLabs Speech-to-Text: send raw audio buffer, receive transcript
+// Map ISO 639-1 code returned by ElevenLabs STT to BCP-47 for PolyAI
+function sttLangToPolyai(code = '') {
+  const map = { sr: 'sr-RS', en: 'en-US', de: 'de-DE', fr: 'fr-FR', it: 'it-IT', es: 'es-ES', hr: 'hr-HR' };
+  return map[String(code).toLowerCase().slice(0, 2)] || 'sr-RS';
+}
+
+// ElevenLabs Speech-to-Text: send raw audio buffer, auto-detect language, return { transcript, detectedLang }
 async function elevenLabsSTT(audioBuffer, mimeType = 'audio/webm') {
   const key = process.env.ELEVENLABS_API_KEY;
   if (!key) throw new Error('ELEVENLABS_API_KEY not set');
 
-  // Build multipart form manually (no extra deps needed in Node 18+)
   const boundary = '----FormBoundary' + Math.random().toString(36).slice(2);
   const CRLF = '\r\n';
-  const langHint = process.env.ELEVENLABS_STT_LANG || 'sr';
 
+  // No language_code hint — let Scribe auto-detect so English & Serbian both work
   const pre = Buffer.from(
     `--${boundary}${CRLF}` +
     `Content-Disposition: form-data; name="model_id"${CRLF}${CRLF}scribe_v1${CRLF}` +
-    `--${boundary}${CRLF}` +
-    `Content-Disposition: form-data; name="language_code"${CRLF}${CRLF}${langHint}${CRLF}` +
     `--${boundary}${CRLF}` +
     `Content-Disposition: form-data; name="file"; filename="audio.webm"${CRLF}` +
     `Content-Type: ${mimeType}${CRLF}${CRLF}`
@@ -232,7 +235,7 @@ async function elevenLabsSTT(audioBuffer, mimeType = 'audio/webm') {
   });
   if (!r.ok) { const t = await r.text(); throw new Error(`ElevenLabs STT ${r.status}: ${t}`); }
   const data = await r.json();
-  return data.text || '';
+  return { transcript: data.text || '', detectedLang: sttLangToPolyai(data.language_code) };
 }
 
 // ElevenLabs Text-to-Speech: send text, receive MP3 buffer
@@ -372,10 +375,11 @@ app.post('/api/chat/speak', async (req, res) => {
     const audioBuffer = Buffer.concat(chunks);
     const mimeType = req.headers['content-type'] || 'audio/webm';
 
-    const transcript = await elevenLabsSTT(audioBuffer, mimeType);
+    const { transcript, detectedLang } = await elevenLabsSTT(audioBuffer, mimeType);
     if (!transcript) return res.status(422).json({ error: 'Could not transcribe audio.' });
 
-    const { reply, ended } = await polyaiSendMessage(session.conversation_id, transcript, lang);
+    // Use detected speech language so agent mirrors the caller (SR if Serbian, EN if English, etc.)
+    const { reply, ended } = await polyaiSendMessage(session.conversation_id, transcript, detectedLang);
     if (ended) sessions.delete(session_id);
 
     const audioOut = await elevenLabsTTS(reply);

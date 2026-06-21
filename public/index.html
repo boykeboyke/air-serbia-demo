@@ -488,7 +488,7 @@ function startCall() {
 async function vcStart() {
   vcSetStatus('Connecting...');
   try {
-    const lang = 'sr-RS'; // voice agent always in Serbian regardless of UI language toggle
+    const lang = (LANG === 'sr') ? 'sr-RS' : 'en-US'; // greeting matches UI language toggle
     const r = await fetch('/api/chat/session', {
       method: 'POST', headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ lang })
