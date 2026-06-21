@@ -700,7 +700,7 @@ const DICT = {
 // runtime strings used by JS (English defaults)
 const JS_EN = { fs_checking:"Checking...", fs_err:"Lookup unavailable right now.",
   agent_call_pending:"The voice agent is not published yet. This is the local build; the widget wires in once the agent is created in PolyAI Studio." };
-let LANG = 'en';
+let LANG = 'sr';
 const EN_CACHE = {};
 function T(key){ if(LANG==='sr' && DICT.sr[key]!=null) return DICT.sr[key]; if(JS_EN[key]!=null) return JS_EN[key]; return EN_CACHE[key]||key; }
 function setLang(lang){
@@ -730,7 +730,7 @@ const obs = new IntersectionObserver((entries)=>{
 ids.forEach(id=>{ const el=document.getElementById(id); if(el) obs.observe(el); });
 
 // init
-setLang('en');
+setLang('sr');
 initVoicePanel();
 </script>
 </body>
