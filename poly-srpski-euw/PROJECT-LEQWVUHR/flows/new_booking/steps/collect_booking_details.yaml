@@ -1,9 +1,16 @@
 step_type: default_step
 name: Collect Booking Details
 conditions:
-- name: Collected
+- name: Schedule Query
   condition_type: step_condition
-  description: All booking details collected
+  description: Caller wants to see availability across a date range or period (not a specific date) — e.g. "which days do you fly", "show me weekends in July"
+  child_step: check_availability
+  required_entities:
+  - destination_city
+  - travel_period
+- name: Specific Booking
+  condition_type: step_condition
+  description: Caller has a specific travel date and wants to book
   child_step: check_availability
   required_entities:
   - origin_city
@@ -15,15 +22,18 @@ extracted_entities:
 - num_passengers
 - origin_city
 - destination_city
+- travel_period
 - fare_preference
 prompt: |-
-  Prikupi detalje rezervacije leta od pozivaoca. Pitaj za:
-  - Grad polaska (odakle lete)
-  - Grad dolaska (kuda lete)
-  - Datum putovanja
-  - Broj putnika
-  - Preferenca klase (ekonomska ili biznis) — ako ne kažu, pretpostavi ekonomsku
+  Prikupi detalje od pozivaoca. Izvuci sve što je već pomenuto — ne pitaj ponovo.
 
-  Ako je pozivalac već pomenuo neke od ovih podataka, izvuci ih — ne pitaj ponovo.
-  Pitaj za nedostajuće podatke prirodno, jedan ili dva istovremeno.
-  Današnji datum je {{vrbl:current_date}}.
+  Ako pozivalac pita "kojim danima letite" ili "ima li letova u periodu X" (raspored, ne rezervacija):
+  - Potrebno: grad dolaska, period (npr. "vikendi u drugoj polovini jula")
+  - Grad polaska se podrazumeva Beograd ako nije naveden — ne pitaj za njega
+  - Odmah pretraži čim imaš destinaciju i period — ne pitaj za tačan datum niti broj putnika
+
+  Ako pozivalac želi konkretnu rezervaciju:
+  - Potrebno: grad polaska, grad dolaska, tačan datum, broj putnika
+  - Klasa (ekonomska/biznis) — pretpostavi ekonomsku ako nije navedeno
+
+  Pitaj prirodno, jedan ili dva podatka po obratu. Današnji datum je {{vrbl:current_date}}.

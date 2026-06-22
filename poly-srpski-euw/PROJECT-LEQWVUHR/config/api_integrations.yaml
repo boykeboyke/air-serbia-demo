@@ -28,3 +28,6 @@ api_integrations:
   - name: check_in
     method: POST
     resource: /api/checkin
+  - name: search_flights
+    method: GET
+    resource: /api/flight-search

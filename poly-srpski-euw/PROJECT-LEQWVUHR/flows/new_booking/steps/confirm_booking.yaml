@@ -3,13 +3,19 @@ name: Confirm Booking
 conditions:
 - name: Confirmed
   condition_type: step_condition
-  description: The caller confirmed and wants to proceed with booking
+  description: The caller confirmed all details and wants to proceed with booking
   child_step: execute_booking
   required_entities:
   - origin_city
   - destination_city
   - travel_date
   - num_passengers
+  - passenger_full_name
+  - passenger_email
+  - passenger_dob
+  - passenger_nationality
+  - passenger_passport_number
+  - passenger_passport_expiry
 - name: Declined
   condition_type: step_condition
   description: The caller does not want to proceed or wants to start over
@@ -21,14 +27,28 @@ extracted_entities:
 - origin_city
 - destination_city
 - fare_preference
+- passenger_full_name
+- passenger_email
+- passenger_dob
+- passenger_nationality
+- passenger_passport_number
+- passenger_passport_expiry
 prompt: |-
-  Pročitaj detalje rezervacije radi potvrde:
-  - Ruta: {{entity:origin_city}} do {{entity:destination_city}}
-  - Datum: {{entity:travel_date}}
-  - Putnici: {{entity:num_passengers}}
-  - Klasa: {{entity:fare_preference}}
-  - Let: {{vrbl:chosen_flight}} po ceni od {{vrbl:chosen_price}} evra
+  Pročitaj kompletan rezime rezervacije radi finalne potvrde:
 
-  Pitaj pozivaoca da potvrdi: da li žele da nastave sa rezervacijom?
-  NE govori da je rezervacija potvrđena — to je sledeći korak.
-  Ako pozivalac ispravi neki podatak, izvuci ažuriranu vrednost i ponovo pročitaj rezime.
+  Let:
+  - Ruta: {{entity:origin_city}} → {{entity:destination_city}}
+  - Datum: {{entity:travel_date}}
+  - Let: {{vrbl:chosen_flight}}, klasa: {{entity:fare_preference}}
+  - Putnici: {{entity:num_passengers}}
+  - Ukupna cena: {{vrbl:chosen_price}} evra
+
+  Podaci putnika:
+  - Ime: {{entity:passenger_full_name}}
+  - Email: {{entity:passenger_email}}
+  - Datum rođenja: {{entity:passenger_dob}}
+  - Nacionalnost: {{entity:passenger_nationality}}
+  - Pasoš / LK: {{entity:passenger_passport_number}}, važi do {{entity:passenger_passport_expiry}}
+
+  Pitaj pozivaoca da potvrdi sve detalje. NE govori da je rezervacija potvrđena — to je sledeći korak.
+  Ako pozivalac ispravi bilo koji podatak, izvuci ažuriranu vrednost i ponovo pročitaj ceo rezime.

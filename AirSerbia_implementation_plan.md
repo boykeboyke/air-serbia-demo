@@ -13,7 +13,7 @@ Two chat modes controlled by `CHAT_MODE` env var:
 
 **`polyai_full`** — PolyAI voice widget handles everything (speech-to-speech). Widget dropped into the "The Agent" tab once Studio agent is published.
 
-**`elevenlabs_hybrid`** (currently active) — Browser mic → ElevenLabs STT → PolyAI Chat API (text-to-text, `tts_lang_code: sr-RS` forces Serbian) → ElevenLabs TTS → audio playback. Transcript shown in UI. Session managed server-side with 1-hour TTL.
+**Hybrid web voice** (currently active) — Browser mic → speech recognition → PolyAI Chat API (text-to-text, `tts_lang_code: sr-RS` forces Serbian) → speech playback. Transcript shown in UI. Session managed server-side with 1-hour TTL.
 
 The Railway server also hosts the branded microsite and proxies live flight data (AviationStack).
 
@@ -72,22 +72,22 @@ The Railway server also hosts the branded microsite and proxies live flight data
 
 ---
 
-## Phase 4 — ElevenLabs hybrid voice chat ✅ COMPLETE
+## Phase 4 — Hybrid web voice chat ✅ COMPLETE
 
 | Task | Status | Notes |
 |---|---|---|
-| `CHAT_MODE` feature flag | ✅ | `polyai_full` (default) vs `elevenlabs_hybrid` |
-| ElevenLabs STT (Scribe v1) | ✅ | Multipart audio upload, `ELEVENLABS_STT_LANG=sr` |
+| `CHAT_MODE` feature flag | ✅ | `polyai_full` (default) vs hybrid web voice |
+| Speech recognition | ✅ | Multipart audio upload, Serbian-first |
 | PolyAI Chat API integration | ✅ | `tts_lang_code: sr-RS` forces Serbian text responses |
-| ElevenLabs TTS | ✅ | Voice `peXmQaCErbfrWCM5FqjH`, eleven_multilingual_v2 |
+| Speech playback | ✅ | Serbian-first voice output |
 | Server-side session store | ✅ | In-memory Map, 1-hour TTL |
 | Greeting spoken aloud on start | ✅ | `/api/chat/tts` endpoint, plays before mic unlocks |
 | Voice chat UI (mic button) | ✅ | Push-to-talk, transcript panel, end call button |
 | UTF-8 / Cyrillic transcript fix | ✅ | `b64utf8()` via TextDecoder — no more garbled chars |
 | `vcPlaying` state reset fix | ✅ | Mic re-enables after greeting finishes |
 | All Studio function steps in Serbian | ✅ | No English strings fed to LLM (eliminates language drift) |
-| Deployed to Railway (hybrid mode) | ✅ | `CHAT_MODE=elevenlabs_hybrid` set as Railway env var |
-| All secrets set on Railway | ✅ | `POLY_ADK_KEY`, `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_ID` |
+| Deployed to Railway (hybrid mode) | ✅ | Hybrid voice mode set as Railway env var |
+| All secrets set on Railway | ✅ | Voice and PolyAI credentials configured |
 
 ### New API routes (server.js)
 
@@ -97,7 +97,7 @@ The Railway server also hosts the branded microsite and proxies live flight data
 | `POST /api/chat/session` | Creates PolyAI session, returns greeting |
 | `POST /api/chat/message` | Text in → Serbian text reply |
 | `POST /api/chat/tts` | Text → MP3 (speaks greeting) |
-| `POST /api/chat/speak` | Audio in → ElevenLabs STT → PolyAI → ElevenLabs TTS → MP3 out |
+| `POST /api/chat/speak` | Audio in → speech recognition → PolyAI → speech playback |
 | `POST /api/chat/end` | Closes PolyAI session |
 
 ---

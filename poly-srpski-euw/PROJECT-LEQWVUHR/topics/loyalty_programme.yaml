@@ -1,8 +1,24 @@
 name: Loyalty Programme
 enabled: true
 actions: Use {{fn:start_loyalty_check}} to check Etihad Guest loyalty status.
-content: Er Srbija je partner sa Etihad Airways programom lojalnosti, Etihad Guest. Članovi zarađuju
-  i koriste milje na Er Srbija letovima. Možemo proveriti nivo članstva i stanje milja.
+content: |-
+  Program lojalnosti Er Srbije je Air Serbia Etihad Guest (bivši Extra Flight Club, integrisan u Etihad Guest od oktobra 2013.).
+
+  ZARAĐIVANJE MILJA:
+  - Milje se zarađuju letenjem sa Er Srbijom, Etihad Airwaysom ili nekim od 20+ partnerskih avio-kompanija.
+  - Milje se zarađuju i kod 150+ partnera van avijacije: hoteli, rent-a-car, maloprodajni partneri.
+
+  KORIŠĆENJE MILJA:
+  - Reward karte (besplatne karte) i nadogradnja klase.
+  - Kupovina u Etihad Guest reward prodavnici.
+
+  PORODIČNO ČLANSTVO:
+  - Može se kreirati porodično članstvo sa do 8 članova.
+  - 100% milja koje zaradi član porodice prenosi se na Porodičnog vođu.
+  - Porodični vođa mora imati najmanje 21 godinu.
+
+  NIVOI ČLANSTVA (tiers): Silver, Gold, Platinum — različite beneficije po nivou.
+  Možemo proveriti nivo članstva i stanje milja na osnovu broja Etihad Guest kartice i prezimena.
 example_queries:
 - Želim da proverim svoje milje
 - Koliko imam Etihad Guest milja?

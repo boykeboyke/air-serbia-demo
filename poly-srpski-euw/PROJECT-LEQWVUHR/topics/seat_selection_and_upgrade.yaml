@@ -1,0 +1,31 @@
+name: Seat Selection and Upgrade
+enabled: true
+actions: ''
+content: |-
+  IZBOR SEDIŠTA:
+  - Sedište se može odabrati tokom rezervacije ili naknadno, uz naknadu koja zavisi od tarife.
+  - Ekonom Comfort i Biznis klasa uključuju besplatan izbor sedišta unapred.
+  - Ekonom Light i Standard: izbor sedišta plaća se kao ancilarna usluga.
+
+  NADOGRADNJA DO BIZNIS KLASE — LICITACIJA (Bid for Business Upgrade):
+  - Putnici koji su rezervisali let najmanje 7 dana pre polaska mogu dobiti poziv za licitaciju putem email-a.
+  - Proces: unos PNR koda i prezimena, zatim slanje ponude (cena po sopstvenom izboru).
+  - Sedište se NE bira pri slanju ponude — ako je ponuda prihvaćena, sedište se automatski dodeljuje.
+  - Er Srbija obaveštava o statusu ponude najkasnije 6 sati pre polaska.
+  - Naplata samo ako je ponuda prihvaćena; u suprotnom, nema naplate.
+  - Ponudu je moguće promeniti ili povući u bilo kom trenutku pre prihvatanja.
+  - Kvota prtljaga ostaje ista kao na originalnoj karti (plus eventualno predkupljeni prtljag).
+
+  PRIORITETNE USLUGE:
+  - Priority check-in: dostupan za Biznis klasu i određene Etihad Guest nivoe.
+  - Priority boarding: ukrcavanje pre ostalih putnika.
+example_queries:
+- Kako da rezervišem sedište?
+- Mogu li da biram sedište?
+- Šta je bid for upgrade?
+- Kako da se nadogradim u biznis klasu?
+- Licitacija za biznis klasu, kako funkcioniše?
+- Da li mogu da promenim sedište?
+- How do I select a seat?
+- Can I upgrade to business class?
+- What is the bid upgrade process?

@@ -1,15 +1,15 @@
 step_type: default_step
 name: Confirm Check In
 conditions:
-- name: Confirmed
-  condition_type: step_condition
-  description: Caller confirmed they want to check in
-  child_step: execute_check_in
-  required_entities: []
 - name: Declined
   condition_type: step_condition
   description: Caller declined check-in
   child_step: decline_check_in
+  required_entities: []
+- name: Confirmed
+  condition_type: step_condition
+  description: Caller confirmed they want to check in
+  child_step: checkin_complete
   required_entities: []
 extracted_entities: []
 prompt: |-

@@ -3,15 +3,44 @@ enabled: true
 actions: Ako pozivalac želi da DODA dodatni prtljag na postojeću rezervaciju (ne samo da pita o 
   dozvoljenom prtljagu), koristi {{fn:start_add_baggage}}.
 content: |-
-  Ručni prtljag: 1 komad do 8kg, maksimalne dimenzije 55x40x20cm, plus 1 lični predmet (tašna, torba za laptop).
+  RUČNI PRTLJAG:
+  - 1 komad do 8kg, maksimalne dimenzije 55x40x20cm — označava se plavom oznakom i smešta u pretinac iznad sedišta.
+  - Plus 1 lični predmet (tašna, torba za laptop) koji ide ispod sedišta.
 
-  Predati prtljag ekonomska klasa: 1 komad do 23kg uključen u cenu karte (Ekonom Standard i Ekonom Flex). Ekonom Light nema uključen predati prtljag.
+  PREDATI PRTLJAG — EKONOMSKA KLASA:
+  - Ekonom Light: nema uključen predati prtljag (samo ručni).
+  - Ekonom Standard: 1 komad do 23kg uključen.
+  - Ekonom Comfort: 1 komad do 23kg uključen.
 
-  Predati prtljag biznis klasa: 2 komada po 32kg uključena.
+  PREDATI PRTLJAG — BIZNIS KLASA:
+  - 2 komada po 32kg uključena, plus 2 komada ručnog prtljaga.
 
-  Dodatni prtljag: može se kupiti online ili na aerodromu. Cene variraju u zavisnosti od destinacije.
+  VRSTE PREDATOG PRTLJAGA I DIMENZIJE:
+  - Standardni prtljag: do 23kg, zbir dimenzija (dužina + širina + visina) max 158cm.
+  - XL prtljag: do 32kg, zbir dimenzija max 203cm. Prihvata se uz doplatu.
+  - Prekotežan prtljag: između 23kg i 32kg (uz doplatu za prekomaše).
+  - Preveliki prtljag: zbir dimenzija između 158cm i 203cm (uz doplatu).
+  - Kombinovano: prekomaša i po težini i po dimenzijama — plaća se duplata.
+  - Prtljag teži od 32kg i/ili zbir dimenzija preko 203cm: prihvata se SAMO kao kargo, ne kao prtljag.
 
-  Specijalni prtljag (sportska oprema, muzički instrumenti): prihvata se uz doplatu. Kontaktirati Er Srbiju unapred za detalje.
+  DODATNI PRTLJAG — CENE (od 17. aprila 2026.):
+  Evropske destinacije:
+  - Online (do 4h pre polaska): 130 EUR za 1. komad, 135 EUR za svaki sledeći.
+  - Na aerodromu: više cene — preporučuje se online kupovina.
+  Rute za SAD (Njujork, Čikago):
+  - Online unapred: 80 EUR po komadu.
+  - Na aerodromu: 100 EUR po komadu.
+  Rute za Kinu (Guangžu, Šangaj):
+  - Online unapred: 90 EUR po komadu.
+  - Na aerodromu: 120 EUR po komadu.
+  Prekomaša težine (23–32kg) ili dimenzija (158–203cm): dodatnih 65–85 EUR u zavisnosti od rute.
+  Prekomaša i težine i dimenzija: dodatnih 130–170 EUR.
+
+  OŠTEĆENI/IZGUBLJENI PRTLJAG:
+  - Ako prtljag nedostaje po dolasku: odmah se prijaviti u Kancelariju za izgubljeni prtljag i popuniti PIR obrazac (Passenger Irregularity Report).
+  - Prijava oštećenja: u roku od 7 dana od preuzimanja prtljaga.
+  - Prijava kašnjenja prtljaga: u roku od 21 dana.
+  - Ako prtljag nije pronađen u roku od 21 dana: može se podneti odštetni zahtev.
 example_queries:
 - Koliko prtljaga mogu da ponesem?
 - Koja je dozvoljena težina prtljaga?
@@ -19,5 +48,13 @@ example_queries:
 - Koliko košta dodatni kofer?
 - Dimenzije ručnog prtljaga
 - Mogu li da ponesem gitaru u avion?
+- Koje su cene za doplaćivanje prtljaga ako imam višak?
+- Koje dimenzije i težinu može imati predati kofer?
+- Šta je standardni a šta XL prtljag?
+- Imam kofer od 28kg, koliko plaćam?
+- Koliki kofer mogu da predam?
+- Razlika između standardnog i XL prtljaga
 - What's my baggage allowance?
 - How much luggage can I bring?
+- What are the baggage size limits?
+- How much does extra baggage cost?

@@ -1,0 +1,37 @@
+name: Premium Lounge
+enabled: true
+actions: ''
+content: |-
+  Er Srbija Premium Lounge se nalazi u tranzitnoj zoni između gejta A4 i A5 u Terminalu 2 aerodroma Nikola Tesla u Beogradu.
+
+  RADNO VREME: Svaki dan od 05:00 do 18:00.
+
+  BESPLATAN PRISTUP:
+  - Putnici Er Srbije u Biznis klasi koji putuju iz Beograda.
+  - Putnici sa Ekonom Comfort tarifom koji putuju iz Beograda na Er Srbija letu.
+  - Nosioci korporativnih članskih kartica Er Srbije.
+  - Etihad Guest Gold i Platinum članovi na Er Srbija letovima.
+
+  PLAĆEN PRISTUP:
+  - Moguća kupovina ulaznice (passa) — unapred online ili na šalteru Lounuşa.
+  - Cena zavisi od mesta kupovine i avio-kompanije kojom putujete.
+
+  SADRŽAJ LOUNUŞA:
+  - Besplatan Wi-Fi visokih brzina.
+  - Prostrane kupatilne prostorije sa tušem.
+  - Bogat izbor srpske i međunarodne hrane (topli i hladni bife).
+  - Autentična srpska jela, domaća vina, rakija, pivo, žestoka pića, bezalkoholna pića.
+  - Međunarodne i domaće novine i časopisi.
+
+  LOUNOVI PO SVETU:
+  - Er Srbija nudi pristup partnerskim lounovima na odabranim destinacijama — detalje proveriti na sajtu airserbia.com.
+example_queries:
+- Da li imam pristup lounuşu?
+- Šta uključuje biznis klasa na aerodromu?
+- Gde se nalazi Premium Lounge?
+- Kada je otvoren lounge na beogradskom aerodromu?
+- Mogu li da uđem u lounge kao Etihad Gold član?
+- Koliko košta ulaznica za lounge?
+- Do I have lounge access?
+- Where is the Air Serbia lounge?
+- What's included in the premium lounge?

@@ -1,6 +1,6 @@
 name: New Booking
 enabled: true
-actions: Use {{fn:start_new_booking}} to begin the booking process.
+actions: Immediately call {{fn:start_new_booking}}. Never answer schedule, availability, days, times or price questions from general knowledge — always enter the flow and search live data.
 content: Pozivaocu možemo rezervisati novi let. Prikupljamo rutu, datum putovanja, broj putnika i 
   preferencu klase (ekonomska ili biznis), pretražujemo dostupne letove i potvrđujemo rezervaciju.
 example_queries:
@@ -10,5 +10,15 @@ example_queries:
 - Rezervacija novog leta
 - Koliko košta let za London?
 - Ima li letova za Amsterdam sutra?
+- Da li letite iz Beograda za Split?
+- Kojim danima imate letove za Dubrovnik?
+- Ima li direktnih letova za Tivat u julu?
+- Kada leti sledeći avion za Pariz?
+- Da li postoje letovi za Beč krajem meseca?
+- Koji letovi postoje iz Beograda za Split u drugoj polovini jula?
 - I'd like to book a flight
 - How much is a ticket to Paris?
+- Do you fly from Belgrade to Dubrovnik?
+- What days do you fly to Split?
+- Are there flights to London next week?
+- When is the next flight to Amsterdam?

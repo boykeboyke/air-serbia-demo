@@ -1,8 +1,28 @@
 name: Cancel Booking
 enabled: true
 actions: Use {{fn:start_cancel_booking}} to begin the cancellation process.
-content: Pozivaocu možemo otkazati postojeću rezervaciju na osnovu referentne oznake. Agent čita 
-  detalje rezervacije, objašnjava politiku povrata i traži potvrdu pre otkazivanja.
+content: |-
+  Pozivaocu možemo otkazati postojeću rezervaciju na osnovu referentne oznake (PNR). Agent čita detalje, objašnjava politiku povrata i traži potvrdu pre otkazivanja.
+
+  POLITIKA POVRATA NOVCA:
+  - Povrat se vrši prema uslovima tarife kupljene karte.
+  - Karte su važeće za povrat 2 godine od datuma izdavanja originalne karte.
+  - Plaćanje karticom: povrat u roku od 7 radnih dana od prijema zahteva.
+  - Plaćanje čekom/gotovinom: povrat u roku od 20 kalendarskih dana.
+
+  KAD ER SRBIJA OTKAŽE LET (operativni razlozi) — putnik bira JEDNU od 3 opcije:
+  - OPCIJA 1: Besplatna promena datuma ±7 dana od otkazanog leta (isti ili slični let).
+  - OPCIJA 2: Besplatna promena destinacije unutar mreže Er Srbije, slična udaljenost, ±7 dana.
+  - OPCIJA 3: VAUČER u vrednosti karte + 10% neto tarife + gorivi porez (YQ) + ancilarne usluge (ako ne zna novi datum).
+  Agent treba da objasni sve tri opcije korisniku kada ga/ju pita šta želi.
+
+  KREDIT VAUČER:
+  - Važi za kupovinu novih karata Er Srbije.
+  - Ako je let otkazao Er Srbija: vrednost vaučera = cena karte + 10% neto tarife + YQ + ancilarne.
+
+  DOBROVOLJNO OTKAZIVANJE (putnik otkazuje):
+  - Naknada za otkazivanje zavisi od tarife (Ekonom Light ima restriktivne uslove, Flex i Comfort fleksibilnije).
+  - Preporučiti putniku da proveri uslove svoje tarife pre otkazivanja.
 example_queries:
 - Želim da otkažem svoj let
 - Mogu li da otkažem rezervaciju?

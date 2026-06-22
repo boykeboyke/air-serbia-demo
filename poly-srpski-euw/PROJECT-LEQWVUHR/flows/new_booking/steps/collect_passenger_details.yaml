@@ -1,0 +1,38 @@
+step_type: default_step
+name: Collect Passenger Details
+conditions:
+- name: Details Collected
+  condition_type: step_condition
+  description: All required passenger details have been collected
+  child_step: check_availability
+  required_entities:
+  - passenger_full_name
+  - passenger_email
+  - passenger_dob
+  - passenger_nationality
+  - passenger_passport_number
+  - passenger_passport_expiry
+- name: Declined
+  condition_type: step_condition
+  description: The caller does not want to proceed
+  child_step: Collect Booking Details
+  required_entities: []
+extracted_entities:
+- passenger_passport_expiry
+- passenger_email
+- passenger_full_name
+- passenger_passport_number
+- passenger_dob
+- passenger_nationality
+prompt: |-
+  Pre nego što pretražimo letove, potrebni su nam podaci putnika koji odgovaraju putnoj ispravi.
+
+  Prikupi sledeće podatke, prirodno jedan ili dva po obratu:
+  - Puno ime (kao u pasošu / ličnoj karti)
+  - Email adresa (za potvrdu rezervacije)
+  - Datum rođenja
+  - Nacionalnost / državljanstvo
+  - Broj pasoša ili lične karte
+  - Datum isteka pasoša ili lične karte
+
+  Ako je pozivalac već pomenuo neke od ovih podataka, izvuci ih — ne pitaj ponovo.

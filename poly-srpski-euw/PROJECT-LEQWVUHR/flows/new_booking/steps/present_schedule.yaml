@@ -1,0 +1,43 @@
+step_type: default_step
+name: Present Schedule
+conditions:
+- name: Date Selected
+  condition_type: step_condition
+  description: The caller has chosen a specific date from the schedule
+  child_step: map_schedule_selection
+  required_entities:
+  - schedule_date
+- name: Declined All
+  condition_type: step_condition
+  description: The caller does not want any of the shown dates and wants to abort
+  child_step: handle_no_selection
+  required_entities: []
+- name: Refine Period
+  condition_type: step_condition
+  description: The caller wants to search a different time period or date range for the same route
+  child_step: check_availability
+  required_entities:
+  - travel_period
+- name: Change Origin
+  condition_type: step_condition
+  description: The caller wants to search from a different departure city (not Belgrade)
+  child_step: check_availability
+  required_entities:
+  - origin_city
+extracted_entities:
+- schedule_date
+- num_passengers
+- travel_period
+- fare_preference
+- origin_city
+prompt: |-
+  Prikaži raspored letova koji je pronađen. Čitaj prirodno, ne nabrajaj numerički.
+  Vremena su polazak i dolazak, nikada trajanje. Ako vidiš "polazak 09:00, dolazak 10:05", reci "polazak u devet sati, dolazak u deset sati i pet minuta", a ne "trajanje deset minuta i pet sekundi".
+  Kod leta čitaj kao slova plus cifre jednu po jednu, na primer "JU722" je "Ju sedam dva dva".
+
+  {{vrbl:flight_schedule}}
+
+  Nakon što pročitaš raspored, pitaj koji datum im odgovara.
+  Kada pozivalac izabere datum, izvuci ga kao entity schedule_date.
+  Ako pozivalac traži drugačiji period (npr. "drugu polovinu jula", "krajem meseca"), izvuci novi period kao entity travel_period i odmah pretraži ponovo.
+  Ako ni jedan datum ne odgovara i pozivalac ne želi da menja period, ponudi da pretražiš druge opcije.

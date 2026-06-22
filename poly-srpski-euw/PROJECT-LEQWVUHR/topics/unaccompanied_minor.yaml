@@ -1,0 +1,32 @@
+name: Unaccompanied Minor
+enabled: true
+actions: Ako pozivalac želi da REZERVIŠE UM uslugu, uputi ga na Kontakt centar (nije dostupno online). Use {{fn:handoff}} with reason "UNACCOMPANIED_MINOR" only if they need to actually book the service.
+content: |-
+  UM USLUGA (Deca bez pratnje — Unaccompanied Minor):
+
+  STAROSNE GRANICE:
+  - Deca mlađa od 5 godina: NE MOGU leteti sama ni uz UM uslugu. Mora ih pratiti roditelj/staratelj ili osoba od 16+ godina.
+  - Za letove u/iz SAD: deca mlađa od 7 godina ne mogu leteti sama.
+  - 5 do 12 godina: UM usluga je OBAVEZNA.
+  - 12 do 16 godina: UM usluga nije obavezna, ali je dostupna na zahtev roditelja.
+
+  KAKO SE REZERVIŠE:
+  - Nije moguće online — SAMO putem Kontakt centra (0800 111 528 iz Srbije, +381 11 311 2 123 iz inostranstva), u poslovnici Er Srbije ili ovlašćenoj agenciji.
+  - Najkasnije 24 sata pre polaska (36 sati za letove iz Pariza za Beograd).
+  - UM usluga nije dostupna za code-share letove ili letove sa drugom kompanijom.
+
+  DOKUMENTA ZA SRPSKE DRŽAVLJANE:
+  - Deca - srpski državljani moraju imati notarski overenu pisanu saglasnost roditelja za putovanje u inostranstvo bez pratnje. To važi i za decu stariju od 12 godina koji putuju bez UM usluge.
+
+  PRIMER: Dete od 8 godina MOŽE leteti samo — uz obaveznu UM uslugu, rezervisanu preko Kontakt centra. Roditelj predaje dete na aerodromu, a osoblje Er Srbije prati dete tokom celog putovanja do predaje u odredištu.
+example_queries:
+- Moje dete mora da putuje samo
+- Da li dete može samo da leti?
+- Dete mi ima 8 godina i putuje samo za London
+- Koliko godina mora dete da ima da leti samo?
+- UM usluga
+- Deca bez pratnje
+- Kako da prijavim dete koje putuje samo?
+- My child needs to travel alone
+- Can a child fly unaccompanied?
+- Unaccompanied minor service

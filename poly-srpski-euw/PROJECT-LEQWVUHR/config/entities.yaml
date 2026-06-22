@@ -64,6 +64,44 @@ entities:
   description: Caller's complaint or feedback in their own words
   entity_type: free_text
   config: {}
+- name: travel_period
+  description: A date range or period the caller is interested in, e.g. "second half of July weekends", "last week of August"
+  entity_type: free_text
+  config: {}
+- name: schedule_date
+  description: A specific date the caller selects from a presented schedule
+  entity_type: date
+  config:
+    relative_date: false
+- name: passenger_full_name
+  description: Full name of the passenger as it appears on their travel document
+  entity_type: free_text
+  config: {}
+- name: passenger_email
+  description: Email address for booking confirmation
+  entity_type: free_text
+  config: {}
+- name: passenger_dob
+  description: Passenger date of birth
+  entity_type: date
+  config:
+    relative_date: false
+- name: passenger_nationality
+  description: Passenger nationality / country of citizenship
+  entity_type: free_text
+  config: {}
+- name: passenger_passport_number
+  description: Passport or national ID number
+  entity_type: alphanumeric
+  config:
+    enabled: true
+    validation_type: ''
+    regular_expression: ^[A-Za-z0-9]{6,20}$
+- name: passenger_passport_expiry
+  description: Passport or national ID expiry date
+  entity_type: date
+  config:
+    relative_date: false
 - name: baggage_count
   description: Number of extra bags to add (1-5)
   entity_type: numeric

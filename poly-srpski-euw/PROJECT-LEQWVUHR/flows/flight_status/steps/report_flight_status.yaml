@@ -2,18 +2,18 @@ step_type: default_step
 name: Report Flight Status
 conditions:
 - name: Done
-  condition_type: exit_flow_condition
-  description: The caller has received the flight status and has no further questions about this 
-    flight
+  condition_type: step_condition
+  description: Caller has received the flight status and confirmed they have no further questions about this flight
+  child_step: flight_status_done
   required_entities: []
 extracted_entities: []
 prompt: |-
-  Pročitaj pozivaocu status leta:
+  Pročitaj pozivaocu sve relevantne podatke o letu koje si upravo dobio:
   - Let: {{vrbl:flight_code}}
   - Ruta: {{vrbl:flight_route}}
   - Status: {{vrbl:flight_status_result}}
-  - Polazak: {{vrbl:flight_departure}}
-  - Gejt: {{vrbl:flight_gate}}
+  - Gejt/terminal: {{vrbl:flight_gate}}
 
-  Ako let kasni, priznej neprijatnost.
+  Ako let kasni, najpre iskaži razumevanje, pa onda daj ažurirane informacije.
   Zatim pitaj da li ima još nešto čime možeš da pomogneš.
+  Sačekaj odgovor pozivaoca pre nego što zaključiš.

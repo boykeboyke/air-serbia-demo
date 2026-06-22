@@ -7,9 +7,8 @@ def handoff(conv: Conversation, reason: str):
     conv.write_metric("HANDOFF", reason, write_once=True)
     return {
         "utterance": (
-            "I'm sorry, I'm not able to sort that out on this call. Our team can "
-            "help — please call us back during business hours and we'll pick it up "
-            "from there."
+            "Žao mi je, ne mogu to da rešim tokom ovog poziva. "
+            "Naš tim može da vam pomogne — pozovite nas ponovo i bićemo vam na usluzi."
         ),
         "hangup": True,
     }

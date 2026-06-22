@@ -2,17 +2,33 @@ name: Special Assistance
 enabled: true
 actions: Use {{fn:handoff}} with reason "SPECIAL_ASSISTANCE" to transfer to a specialist.
 content: |-
-  Er Srbija pruža posebnu pomoć za putnike sa smanjenom pokretljivošću, medicinskim stanjima i decu koja putuju bez pratnje.
+  INVALIDSKA KOLICA I POKRETNA POMAGALA:
+  - Er Srbija prevozi invalidska kolica BESPLATNO (ne računa se u kvotu prtljaga).
+  - Obaviti najavu najmanje 48 sati pre leta i dostaviti detalje o težini, dimenzijama i tipu pomagala.
+  - Popuniti Wheelchair Description Form i predati na check-in šalteru.
+  - Putnici koji su potpuno zavisni od invalidskih kolica (WCHC) moraju imati MEDIF obrazac (medicinsko uverenje).
+  - WCHC putnici sa hroničnim invaliditetom mogu putovati bez pratnje; ostali moraju imati pratioca.
+  - Er Srbija obezbeđuje invalidska kolica na letu za sve letove za/iz SAD.
 
-  Pomoć na aerodromu: invalidska kolica, pomoć pri ukrcavanju, prioritetno ukrcavanje.
+  MEDICINSKA STANJA I TRUDNOĆA:
+  - Putnici sa medicinskim potrebama moraju kontaktirati Er Srbiju najmanje 48 sati pre leta.
+  - Za neka medicinska stanja potreban je MEDIF obrazac potpisan od lekara.
+  - Trudnoća: Er Srbija ima posebna pravila u zavisnosti od gestacionog perioda — preporučiti da kontaktiraju Er Srbiju unapred.
 
-  Putnici sa medicinskim potrebama treba da kontaktiraju Er Srbiju najmanje 48 sati pre leta.
+  DECA BEZ PRATNJE (UM — Unaccompanied Minor):
+  - Deca mlađa od 5 godina ne mogu leteti sama — moraju biti u pratnji roditelja/staratelja/osobe od 16+ godina.
+  - Za letove u/iz SAD: deca mlađa od 7 godina ne mogu leteti sama.
+  - UM usluga je OBAVEZNA za decu od 5 do 12 godina (7-12 za SAD).
+  - Za decu od 12 do 16 godina: UM usluga nije obavezna, ali je dostupna na zahtev.
+  - Rezervacija UM usluge nije moguća online — samo putem Kontakt centra, poslovnice ili agencije.
+  - Rezervaciju treba obaviti najkasnije 24 sata pre polaska (36 sati za letove iz Pariza).
+  - Srpski državljani (deca): potrebna notarski overena pisana saglasnost roditelja za putovanje u inostranstvo.
 
-  Deca bez pratnje (5-12 godina): prihvataju se uz posebnu uslugu pratnje. Naplaćuje se dodatna naknada.
+  PASI VODIČI:
+  - Prihvataju se u kabini BESPLATNO uz prethodnu najavu.
+  - Kućni ljubimci (psi/mačke) prihvataju se u kabini uz naknadu — max 8kg sa nosiljkom.
 
-  Psi vodiči i emocionalni psi za podršku: prihvataju se u kabini uz prethodnu najavu.
-
-  Za sva pitanja o posebnoj pomoći, povezujemo vas sa specijalistom.
+  Za sva specifična pitanja o posebnoj pomoći, putnike možemo prebaciti specijalistu.
 example_queries:
 - Trebam invalidska kolica na aerodromu
 - Putuje mi dete samo

@@ -1,0 +1,38 @@
+name: Pets
+enabled: true
+actions: ''
+content: |-
+  Er Srbija prihvata kućne ljubimce (pse i mačke) uz prethodnu najavu i naknadu.
+
+  PREVOZ U KABINI:
+  - Prihvataju se samo psi i mačke.
+  - Maksimalna težina: 8kg zajedno sa nosiljkom/kavezom.
+  - Maksimalne dimenzije nosiljke: 40cm (dužina) x 30cm (širina) x 24cm (visina); zbir dimenzija max 94cm.
+  - Broj ljubimaca u kabini je ograničen — rezervacija mora biti potvrđena unapred od strane Er Srbije.
+  - Putnici sa kućnim ljubimcima NE MOGU se prijaviti online — samo na aerodromskom šalteru.
+
+  PREVOZ U PRTLJAŽNOM PROSTORU (hold):
+  - Moguće uz doplatu.
+  - Ljubimac se ne uračunava u besplatan prtljag — naplaćuje se kao višak prtljaga.
+
+  INFORMACIJE ZA REZERVACIJU:
+  - Navesti: vrstu životinje (pas/mačka), težinu sa nosiljkom, dimenzije nosiljke.
+  - Kontaktirati Er Srbiju pre polaska — ne rezervisati online.
+
+  PASI VODIČI:
+  - Psi vodiči koji prate putnike sa invaliditetom prihvataju se u kabini BESPLATNO.
+  - Nije potrebna posebna nosiljka za pse vodiče — putuju pored nogu.
+
+  OGRANIČENJA:
+  - Deca bez pratnje (UM) ne mogu putovati sa kućnim ljubimcima.
+  - Neke destinacije mogu imati posebna veterinarska ili karantinska pravila — putnik je dužan da proveri zahteve odredišne zemlje.
+example_queries:
+- Mogu li da ponesem psa u avion?
+- Kako da ponesem mačku na let?
+- Koliko košta prevoz kućnog ljubimca?
+- Da li prihvatate ljubimce u kabini?
+- Koja je maksimalna težina psa koji može da leti?
+- Kako se rezerviše prevoz ljubimca?
+- Can I bring my dog on the flight?
+- Pet travel policy
+- How do I travel with my cat?

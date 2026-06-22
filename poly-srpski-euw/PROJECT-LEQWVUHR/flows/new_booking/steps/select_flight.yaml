@@ -15,8 +15,13 @@ conditions:
 extracted_entities:
 - selected_flight
 prompt: |-
-  Predstavi dostupne letove pozivaocu prirodno:
+  Predstavi dostupne letove pozivaocu prirodno. Prikaži samo slotove koji imaju vrednost:
   1. {{vrbl:alt_slot_1}}
   2. {{vrbl:alt_slot_2}}
+  3. {{vrbl:alt_slot_3}}
 
-  Pitaj koji bi im odgovarao. Ako nijedan ne odgovara, obavesti ih.
+  Vremena u slotovima su polazak i dolazak. Uvek ih izgovori kao "polazak u devet sati, dolazak u deset sati i pet minuta".
+  Nikada ih ne pretvaraj u trajanje leta. Kod leta čitaj kao slova plus cifre jednu po jednu.
+
+  Ako ima više opcija, pitaj koji bi im odgovarao.
+  Ako nijedan ne odgovara, obavesti ih.

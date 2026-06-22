@@ -45,41 +45,43 @@ def lookup_flight_status(conv: Conversation, flow: Flow):
         conv.state.flight_status_result = "Sleteo"
         conv.state.flight_departure = scheduled
     else:
-        conv.state.flight_status_result = "Na vreme"
+        conv.state.flight_status_result = f"Na vreme — polazak {scheduled}"
         conv.state.flight_departure = scheduled
 
+    gate_txt = conv.state.flight_gate
     flow.goto_step("Report Flight Status", "found")
     return (
-        f"Podaci o letu {conv.state.flight_code}: "
-        f"ruta {conv.state.flight_route}, "
-        f"status {conv.state.flight_status_result}, "
-        f"planirani polazak {conv.state.flight_departure}, "
-        f"gejt/terminal {conv.state.flight_gate}. "
-        f"Saopšti pozivaocu sve relevantne informacije."
+        f"PODACI O LETU: {conv.state.flight_code} | "
+        f"Ruta: {conv.state.flight_route} | "
+        f"Status: {conv.state.flight_status_result} | "
+        f"Gejt/terminal: {gate_txt}. "
+        f"Saopšti pozivaocu sve ove informacije odmah i jasno. "
+        f"Ako let kasni, prvo iskaži razumevanje pa onda daj ažurirane informacije."
     )
 
 
 def _fetch_live_flight(flight_number, conv):
-    """Try api_integrations.yaml connector (air_serbia_api.get_flight_status), then UI connector."""
+    """Try api_integrations.yaml connector, then UI connector."""
     raw = None
 
-    # Pattern 1: api_integrations.yaml — conv.api.air_serbia_api.get_flight_status(flight_number)
-    try:
-        resp = conv.api.air_serbia_api.get_flight_status(flight_number)
-        if hasattr(resp, "status_code"):
-            if resp.status_code == 200:
-                raw = resp.json()
-        elif isinstance(resp, dict):
-            raw = resp
-    except Exception:
-        pass
-
-    # Pattern 2: Studio UI connector — conv.api.get_flight_status(flight_number=...)
-    if not raw:
+    for attempt in [
+        lambda: conv.api.air_serbia_api.get_flight_status(flight_number=flight_number),
+        lambda: conv.api.air_serbia_api.get_flight_status(flight_number),
+        lambda: conv.api.get_flight_status(flight_number=flight_number),
+    ]:
         try:
-            raw = conv.api.get_flight_status(flight_number=flight_number)
+            resp = attempt()
+            if resp is None:
+                continue
+            if hasattr(resp, "status_code"):
+                if resp.status_code == 200:
+                    raw = resp.json()
+            elif isinstance(resp, dict) and resp:
+                raw = resp
+            if raw:
+                break
         except Exception:
-            pass
+            continue
 
     if not raw or raw.get("source", "").startswith("sample data"):
         return None

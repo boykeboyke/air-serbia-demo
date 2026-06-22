@@ -10,11 +10,11 @@ content: |-
 
   Code-share partneri: Etihad Airways, Air France, Alitalia i drugi. Rezervacije sa presedanjem dostupne preko naše mreže partnera.
 example_queries:
-- Gde Er Srbija leti?
-- Da li imate direktan let za London?
+- Gde sve Er Srbija leti?
 - Koje su vaše destinacije?
-- Da li letite za Njujork?
-- Letovi iz Beograda
-- Kuda mogu da letim direktno?
-- Where does Air Serbia fly?
-- Do you have direct flights to Paris?
+- Koji su vaši partneri za letove?
+- Da li imate code-share letove?
+- Kuda mogu da letim direktno iz Beograda?
+- Where does Air Serbia fly to?
+- What destinations do you serve?
+- Which airlines do you partner with?

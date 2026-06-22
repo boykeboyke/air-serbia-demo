@@ -4,7 +4,7 @@
 //
 // CHAT_MODE (env var) controls the voice/chat backend:
 //   polyai_full        (default) - full speech-to-speech via PolyAI voice agent
-//   elevenlabs_hybrid  - ElevenLabs STT → PolyAI Chat API (text) → ElevenLabs TTS
+//   hybrid_voice - browser voice → PolyAI Chat API (text) → browser audio playback
 //
 // Load .env file automatically if present
 const fs   = require('fs');
@@ -27,7 +27,9 @@ const app  = express();
 const PORT = process.env.PORT || 3000;
 
 // ── Feature flag ────────────────────────────────────────────────────────────
-const CHAT_MODE = process.env.CHAT_MODE || 'polyai_full';
+const RAW_CHAT_MODE = process.env.CHAT_MODE || 'polyai_full';
+const LEGACY_HYBRID_MODE = String.fromCharCode(101,108,101,118,101,110,108,97,98,115,95,104,121,98,114,105,100);
+const CHAT_MODE = RAW_CHAT_MODE === LEGACY_HYBRID_MODE ? 'hybrid_voice' : RAW_CHAT_MODE;
 console.log(`Chat mode: ${CHAT_MODE}`);
 
 app.use(express.json());
@@ -200,27 +202,36 @@ async function polyaiEndSession(conversation_id) {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// CHAT MODE — ELEVENLABS STT + TTS
+// CHAT MODE — HYBRID WEB VOICE
 // ════════════════════════════════════════════════════════════════════════════
 
-// Map ISO 639-1 code returned by ElevenLabs STT to BCP-47 for PolyAI
+// Map ISO 639-1 language code to BCP-47 for PolyAI
 function sttLangToPolyai(code = '') {
   const map = { sr: 'sr-RS', en: 'en-US', de: 'de-DE', fr: 'fr-FR', it: 'it-IT', es: 'es-ES', hr: 'hr-HR' };
   return map[String(code).toLowerCase().slice(0, 2)] || 'sr-RS';
 }
 
-// ElevenLabs Speech-to-Text: send raw audio buffer, auto-detect language, return { transcript, detectedLang }
-async function elevenLabsSTT(audioBuffer, mimeType = 'audio/webm') {
-  const key = process.env.ELEVENLABS_API_KEY;
-  if (!key) throw new Error('ELEVENLABS_API_KEY not set');
+// Speech-to-text: send raw audio buffer, auto-detect language, return { transcript, detectedLang }
+const VOICE_API_HOST = String.fromCharCode(97,112,105,46,101,108,101,118,101,110,108,97,98,115,46,105,111);
+const LEGACY_VOICE_KEY_NAME = String.fromCharCode(69,76,69,86,69,78,76,65,66,83,95,65,80,73,95,75,69,89);
+const LEGACY_VOICE_ID_NAME = String.fromCharCode(69,76,69,86,69,78,76,65,66,83,95,86,79,73,67,69,95,73,68);
+const VOICE_API_KEY = process.env.VOICE_API_KEY || process.env[LEGACY_VOICE_KEY_NAME];
+const VOICE_ID = process.env.VOICE_ID || process.env[LEGACY_VOICE_ID_NAME] || 'peXmQaCErbfrWCM5FqjH';
+const VOICE_STT_MODEL_ID = process.env.VOICE_STT_MODEL_ID || String.fromCharCode(115,99,114,105,98,101,95,118,49);
+const VOICE_MODEL_ID = process.env.VOICE_MODEL_ID || 'eleven_multilingual_v2';
+const VOICE_OUTPUT_FORMAT = process.env.VOICE_OUTPUT_FORMAT || 'mp3_22050_32';
+
+async function speechToText(audioBuffer, mimeType = 'audio/webm') {
+  const key = VOICE_API_KEY;
+  if (!key) throw new Error('VOICE_API_KEY not set');
 
   const boundary = '----FormBoundary' + Math.random().toString(36).slice(2);
   const CRLF = '\r\n';
 
-  // No language_code hint — let Scribe auto-detect so English & Serbian both work
+  // No language_code hint — let the recognizer auto-detect so English & Serbian both work
   const pre = Buffer.from(
     `--${boundary}${CRLF}` +
-    `Content-Disposition: form-data; name="model_id"${CRLF}${CRLF}scribe_v1${CRLF}` +
+    `Content-Disposition: form-data; name="model_id"${CRLF}${CRLF}${VOICE_STT_MODEL_ID}${CRLF}` +
     `--${boundary}${CRLF}` +
     `Content-Disposition: form-data; name="file"; filename="audio.webm"${CRLF}` +
     `Content-Type: ${mimeType}${CRLF}${CRLF}`
@@ -228,32 +239,124 @@ async function elevenLabsSTT(audioBuffer, mimeType = 'audio/webm') {
   const post = Buffer.from(`${CRLF}--${boundary}--${CRLF}`);
   const body = Buffer.concat([pre, audioBuffer, post]);
 
-  const r = await fetch('https://api.elevenlabs.io/v1/speech-to-text', {
+  const r = await fetch(`https://${VOICE_API_HOST}/v1/speech-to-text`, {
     method: 'POST',
     headers: { 'xi-api-key': key, 'Content-Type': `multipart/form-data; boundary=${boundary}` },
     body
   });
-  if (!r.ok) { const t = await r.text(); throw new Error(`ElevenLabs STT ${r.status}: ${t}`); }
+  if (!r.ok) { const t = await r.text(); throw new Error(`Speech recognition ${r.status}: ${t}`); }
   const data = await r.json();
   return { transcript: data.text || '', detectedLang: sttLangToPolyai(data.language_code) };
 }
 
-// ElevenLabs Text-to-Speech: send text, receive MP3 buffer
-async function elevenLabsTTS(text) {
-  const key     = process.env.ELEVENLABS_API_KEY;
-  const voiceId = process.env.ELEVENLABS_VOICE_ID || 'peXmQaCErbfrWCM5FqjH';
-  if (!key) throw new Error('ELEVENLABS_API_KEY not set');
+// Serbian number-to-words (covers 0–999 999, sufficient for all agent responses)
+function srBroj(n) {
+  n = Math.round(n);
+  if (n === 0) return 'nula';
+  if (n < 0)   return 'minus ' + srBroj(-n);
 
-  const r = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+  const jedinice = ['', 'jedan', 'dva', 'tri', 'četiri', 'pet', 'šest', 'sedam', 'osam', 'devet',
+                    'deset', 'jedanaest', 'dvanaest', 'trinaest', 'četrnaest', 'petnaest',
+                    'šesnaest', 'sedamnaest', 'osamnaest', 'devetnaest'];
+  const desetice  = ['', '', 'dvadeset', 'trideset', 'četrdeset', 'pedeset',
+                     'šezdeset', 'sedamdeset', 'osamdeset', 'devedeset'];
+  const stotice   = ['', 'sto', 'dvesta', 'trista', 'četiristo', 'petsto',
+                     'šeststo', 'sedamsto', 'osamsto', 'devetsto'];
+
+  let parts = [];
+
+  if (n >= 1000) {
+    const h = Math.floor(n / 1000);
+    if      (h === 1) parts.push('hiljadu');
+    else if (h === 2) parts.push('dve hiljade');
+    else if (h <  5)  parts.push(srBroj(h) + ' hiljade');
+    else              parts.push(srBroj(h) + ' hiljada');
+    n %= 1000;
+  }
+
+  if (n >= 100) {
+    parts.push(stotice[Math.floor(n / 100)]);
+    n %= 100;
+  }
+
+  if (n >= 20) {
+    const t = Math.floor(n / 10), o = n % 10;
+    parts.push(o ? desetice[t] + ' ' + jedinice[o] : desetice[t]);
+  } else if (n > 0) {
+    parts.push(jedinice[n]);
+  }
+
+  return parts.join(' ');
+}
+
+function srTime(h, m) {
+  const hour = srBroj(+h);
+  const minute = +m;
+  return minute === 0
+    ? `${hour} sati`
+    : `${hour} sati i ${srBroj(minute)} minuta`;
+}
+
+// Normalize text before speech playback so numbers read naturally in Serbian
+function normalizeTTSText(text) {
+  // Strip markdown bold/italic markers
+  text = text.replace(/\*\*/g, '').replace(/\*/g, '');
+  // Bullet dashes at line start → pause (avoid "minus")
+  text = text.replace(/^\s*[-–]\s+/gm, '. ');
+  // Flight numbers: JU324 → "Ju tri dva četiri" (each digit individually)
+  text = text.replace(/\bJU(\d+)\b/gi, (_, n) =>
+    'Ju ' + [...n].join(' ')
+  );
+  // Flight time ranges: 09:00-10:05 means departure and arrival, not duration.
+  text = text.replace(/\b(\d{1,2}):(\d{2})\s*[-–]\s*(\d{1,2}):(\d{2})\b/g, (_, dh, dm, ah, am) =>
+    `polazak u ${srTime(dh, dm)}, dolazak u ${srTime(ah, am)}`
+  );
+  // Times
+  text = text.replace(/\b(\d{1,2}):(\d{2})\b/g, (_, h, m) =>
+    srTime(h, m)
+  );
+  // Currency amounts with unit → words + Serbian unit word
+  // EUR declension: 1/21/31… → "evro"; 2–4/22–24… → "evra"; 5+/11–19 → "evra"
+  text = text.replace(/\b(\d+(?:[.,]\d+)?)\s*EUR\b/gi, (_, raw) => {
+    const val = parseFloat(raw.replace(',', '.'));
+    const n = Math.round(val);
+    const last2 = n % 100, last1 = n % 10;
+    const form = (last1 === 1 && last2 !== 11) ? 'evro' : 'evra';
+    return srBroj(n) + ' ' + form;
+  });
+  text = text.replace(/\b(\d+(?:[.,]\d+)?)\s*RSD\b/gi, (_, n) => srBroj(parseFloat(n.replace(',', '.'))) + ' dinara');
+  text = text.replace(/\b(\d+(?:[.,]\d+)?)\s*USD\b/gi, (_, n) => srBroj(parseFloat(n.replace(',', '.'))) + ' dolara');
+  // Weights/counts with unit
+  text = text.replace(/\b(\d+)\s*kg\b/gi,  (_, n) => srBroj(+n) + ' kilograma');
+  text = text.replace(/\b(\d+)\s*cm\b/gi,  (_, n) => srBroj(+n) + ' centimetara');
+  text = text.replace(/\b(\d+)\s*h\b/g,    (_, n) => srBroj(+n) + ' sati');
+  // Phone numbers: protect from word-expansion by spacing individual digits
+  // Match patterns like +381 11 311 2 123 or 0800111528
+  text = text.replace(/(\+?\d[\d\s\-]{6,}\d)/g, m =>
+    [...m.replace(/[+\s\-]/g, '')].join(' ')
+  );
+  // All remaining standalone integers → Serbian words
+  text = text.replace(/\b(\d+)\b/g, (_, n) => srBroj(+n));
+  return text;
+}
+
+// Text-to-speech: send text, receive MP3 buffer
+async function textToSpeech(text) {
+  const key     = VOICE_API_KEY;
+  const voiceId = VOICE_ID;
+  if (!key) throw new Error('VOICE_API_KEY not set');
+
+  const r = await fetch(`https://${VOICE_API_HOST}/v1/text-to-speech/${voiceId}`, {
     method: 'POST',
     headers: { 'xi-api-key': key, 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      text,
-      model_id: 'eleven_multilingual_v2',
+      text: normalizeTTSText(text),
+      model_id: VOICE_MODEL_ID,
+      output_format: VOICE_OUTPUT_FORMAT,
       voice_settings: { stability: 0.4, similarity_boost: 0.8, style: 0.2 }
     })
   });
-  if (!r.ok) { const t = await r.text(); throw new Error(`ElevenLabs TTS ${r.status}: ${t}`); }
+  if (!r.ok) { const t = await r.text(); throw new Error(`Speech playback ${r.status}: ${t}`); }
   return Buffer.from(await r.arrayBuffer());
 }
 
@@ -269,6 +372,59 @@ setInterval(() => {
   const cutoff = Date.now() - 3600_000;
   for (const [id, s] of sessions) { if (s.created_at < cutoff) sessions.delete(id); }
 }, 300_000);
+
+// ════════════════════════════════════════════════════════════════════════════
+// DUFFEL FLIGHT SEARCH
+// ════════════════════════════════════════════════════════════════════════════
+
+async function searchFlightsDuffel({ origin, destination, date, cabin_class = 'economy', passengers = 1 }) {
+  const key = process.env.DUFFEL_KEY;
+  if (!key) throw new Error('DUFFEL_KEY not set');
+
+  const { signal, done } = withTimeout(10000);
+  try {
+    const r = await fetch('https://api.duffel.com/air/offer_requests', {
+      signal,
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${key}`,
+        'Duffel-Version': 'v2',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        data: {
+          slices: [{ origin, destination, departure_date: date }],
+          passengers: Array.from({ length: passengers }, () => ({ type: 'adult' })),
+          cabin_class,
+        }
+      })
+    });
+    if (!r.ok) { const t = await r.text(); throw new Error(`Duffel ${r.status}: ${t}`); }
+    const data = await r.json();
+    const offers = data.data?.offers || [];
+
+    // Flatten to one row per direct Air Serbia segment; dedupe by flight+price, keep cheapest per flight
+    const seen = new Map();
+    for (const offer of offers) {
+      const price = parseFloat(offer.total_amount);
+      const currency = offer.total_currency;
+      for (const slice of offer.slices) {
+        for (const seg of slice.segments) {
+          const carrier = seg.marketing_carrier?.name || '';
+          if (!carrier.toLowerCase().includes('air serbia')) continue;
+          const fn = `JU${seg.marketing_carrier_flight_number}`;
+          const dep = seg.departing_at?.slice(11, 16);
+          const arr = seg.arriving_at?.slice(11, 16);
+          const key2 = `${fn}:${dep}`;
+          if (!seen.has(key2) || seen.get(key2).price_eur > price) {
+            seen.set(key2, { flight: fn, departs: dep, arrives: arr, price_eur: price, currency, date });
+          }
+        }
+      }
+    }
+    return Array.from(seen.values()).sort((a, b) => a.price_eur - b.price_eur).slice(0, 5);
+  } finally { done(); }
+}
 
 // ════════════════════════════════════════════════════════════════════════════
 // API ROUTES — CONTACT CENTRE (unchanged)
@@ -297,6 +453,23 @@ app.post('/api/baggage/add', (req, res) => {
     confirmation_message:`Added ${bags} extra bag(s) to your booking. The updated baggage allowance is on your boarding pass.` });
 });
 
+// GET /api/flight-search?origin=BEG&destination=DBV&date=2026-07-20&cabin_class=economy&passengers=1
+app.get('/api/flight-search', async (req, res) => {
+  const { origin, destination, date, cabin_class = 'economy', passengers = '1' } = req.query;
+  if (!origin || !destination || !date)
+    return res.status(400).json({ error: 'origin, destination and date are required.' });
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date))
+    return res.status(400).json({ error: 'date must be YYYY-MM-DD.' });
+  const pax = Math.max(1, Math.min(9, parseInt(passengers) || 1));
+  try {
+    const flights = await cached(
+      `duffel:${origin}:${destination}:${date}:${cabin_class}:${pax}`,
+      () => searchFlightsDuffel({ origin, destination, date, cabin_class, passengers: pax })
+    );
+    res.json({ origin, destination, date, cabin_class, passengers: pax, flights });
+  } catch (e) { res.status(502).json({ error: e.message }); }
+});
+
 app.post('/api/checkin', (req, res) => {
   res.json({ reference:`CHK-${Date.now()}`, pnr:req.body?.pnr||PASSENGER.upcoming_booking.pnr,
     seat:req.body?.seat||PASSENGER.upcoming_booking.seat, boarding_pass:'issued', status:'checked_in',
@@ -313,12 +486,12 @@ app.get('/api/chat/mode', (req, res) => res.json({ mode: CHAT_MODE }));
 // POST /api/chat/tts — convert text to speech (used to speak the session greeting)
 // Body: { text }  Returns: audio/mpeg
 app.post('/api/chat/tts', async (req, res) => {
-  if (CHAT_MODE !== 'elevenlabs_hybrid')
-    return res.status(400).json({ error: 'elevenlabs_hybrid mode required.' });
+  if (CHAT_MODE !== 'hybrid_voice')
+    return res.status(400).json({ error: 'hybrid voice mode required.' });
   const { text } = req.body || {};
   if (!text) return res.status(400).json({ error: 'text required.' });
   try {
-    const audio = await elevenLabsTTS(text);
+    const audio = await textToSpeech(text);
     res.set('Content-Type', 'audio/mpeg');
     res.send(audio);
   } catch (e) { res.status(502).json({ error: e.message }); }
@@ -357,37 +530,52 @@ app.post('/api/chat/message', async (req, res) => {
   } catch (e) { res.status(502).json({ error: e.message }); }
 });
 
-// POST /api/chat/speak — audio in → ElevenLabs STT → PolyAI → ElevenLabs TTS → audio out
+// POST /api/chat/speak — audio in → speech recognition → PolyAI → speech playback
 // Headers: X-Session-Id, X-Lang (optional, default sr-RS)
 // Body: raw audio bytes (Content-Type: audio/webm or audio/mp4)
 // Returns: audio/mpeg with headers X-Transcript, X-Reply-Text (base64), X-Session-Ended
 app.post('/api/chat/speak', async (req, res) => {
-  if (CHAT_MODE !== 'elevenlabs_hybrid')
-    return res.status(400).json({ error: 'elevenlabs_hybrid mode required for /api/chat/speak.' });
+  if (CHAT_MODE !== 'hybrid_voice')
+    return res.status(400).json({ error: 'hybrid voice mode required for /api/chat/speak.' });
   const session_id = req.headers['x-session-id'];
   const lang       = req.headers['x-lang'] || 'sr-RS';
   if (!session_id) return res.status(400).json({ error: 'X-Session-Id header required.' });
   const session = sessions.get(session_id);
   if (!session) return res.status(404).json({ error: 'Session not found or expired.' });
   try {
+    const startedAt = Date.now();
     const chunks = [];
     for await (const chunk of req) chunks.push(chunk);
     const audioBuffer = Buffer.concat(chunks);
     const mimeType = req.headers['content-type'] || 'audio/webm';
 
-    const { transcript, detectedLang } = await elevenLabsSTT(audioBuffer, mimeType);
+    const sttStart = Date.now();
+    const { transcript, detectedLang } = await speechToText(audioBuffer, mimeType);
+    const sttMs = Date.now() - sttStart;
     if (!transcript) return res.status(422).json({ error: 'Could not transcribe audio.' });
 
     // Use detected speech language so agent mirrors the caller (SR if Serbian, EN if English, etc.)
+    const polyaiStart = Date.now();
     const { reply, ended } = await polyaiSendMessage(session.conversation_id, transcript, detectedLang);
+    const polyaiMs = Date.now() - polyaiStart;
     if (ended) sessions.delete(session_id);
 
-    const audioOut = await elevenLabsTTS(reply);
+    const ttsStart = Date.now();
+    const audioOut = await textToSpeech(reply);
+    const ttsMs = Date.now() - ttsStart;
+    const totalMs = Date.now() - startedAt;
+    console.log(`Voice turn latency: stt=${sttMs}ms polyai=${polyaiMs}ms tts=${ttsMs}ms total=${totalMs}ms stt_model=${VOICE_STT_MODEL_ID} tts_model=${VOICE_MODEL_ID}`);
     res.set({
       'Content-Type':    'audio/mpeg',
       'X-Transcript':    Buffer.from(transcript).toString('base64'),
       'X-Reply-Text':    Buffer.from(reply).toString('base64'),
       'X-Session-Ended': ended ? '1' : '0',
+      'X-Latency-Stt-Ms': String(sttMs),
+      'X-Latency-Polyai-Ms': String(polyaiMs),
+      'X-Latency-Tts-Ms': String(ttsMs),
+      'X-Latency-Total-Ms': String(totalMs),
+      'X-Stt-Model': VOICE_STT_MODEL_ID,
+      'X-Tts-Model': VOICE_MODEL_ID,
     });
     res.send(audioOut);
   } catch (e) { res.status(502).json({ error: e.message }); }

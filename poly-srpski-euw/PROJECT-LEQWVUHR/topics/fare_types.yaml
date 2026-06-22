@@ -1,0 +1,32 @@
+name: Fare Types
+enabled: true
+actions: ''
+content: |-
+  Er Srbija nudi više vrsta tarifa (fare types) u ekonomskoj i biznis klasi:
+
+  EKONOMSKA KLASA:
+  - Ekonom Light: Najniža cena, samo ručni prtljag (1 komad, 8kg). Nema uključen predati kofer. Restriktivne mogućnosti promene/otkazivanja.
+  - Ekonom Standard: Uključuje 1 predati kofer do 23kg. Promena datuma moguća uz naknadu od 20 EUR.
+  - Ekonom Comfort: Najfleksibilnija ekonomska tarifa. Uključuje predati prtljag, slobodan izbor sedišta, prijavljivanje na aerodromu i maksimalnu fleksibilnost datuma putovanja.
+
+  BIZNIS KLASA:
+  - Sve prednosti Ekonom Comfort tarife.
+  - Prioritetni check-in i fast-track na aerodromu.
+  - Prioritetno ukrcavanje i rukovanje prtljagom.
+  - 2 predata kofera + 2 komada ručnog prtljaga.
+  - Besplatan pristup Er Srbija Premium Loungu na aerodromu Nikola Tesla u Beogradu.
+
+  PROMENA KARATA:
+  - Naknada za promenu datuma: 20 EUR (konvertovano u valutu plaćanja).
+  - Ako je nova cena karte viša — putnik plaća razliku; ako je niža — vraća se razlika.
+  - Ekonom Light: promena datuma nije moguća ili je uz visoku naknadu — proveriti uslove tarife.
+example_queries:
+- Koja je razlika između tarifa?
+- Šta uključuje Ekonom Light?
+- Koje su prednosti biznis klase?
+- Ekonom Standard vs Comfort, šta je bolje?
+- Mogu li da promenim datum leta?
+- Koliko košta promena karte?
+- What's included in Economy Standard?
+- What are the fare options?
+- Can I change my flight date?

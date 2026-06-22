@@ -8,9 +8,8 @@ conditions:
 extracted_entities: []
 prompt: |-
   Rezervacija je potvrđena! Reci pozivaocu:
-  - Njihova referentna oznaka rezervacije je {{vrbl:booking_reference}}
-  - Ukupna cena je {{vrbl:booking_total}} evra
+  - Referentna oznaka rezervacije: {{vrbl:booking_reference}} (pročitaj slovo po slovo)
+  - Ukupna cena: {{vrbl:booking_total}} evra
+  - Potvrda će biti poslata na: {{vrbl:booking_email}}
 
-  Pročitaj referentnu oznaku jasno, slovo po slovo ako je potrebno.
-  Obavesti ih da će dobiti mejl sa potvrdom.
   Zatim pitaj da li ima još nešto čime možeš da pomogneš danas.
