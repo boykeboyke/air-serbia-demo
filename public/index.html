@@ -60,7 +60,7 @@
     .fade-up { animation:fadeUp .7s ease-out both; }
     @keyframes fadeUp { from{opacity:0;transform:translateY(14px);} to{opacity:1;transform:none;} }
 
-    .logo-as { height:28px; width:auto; }
+    .logo-as { height:140px; width:auto; }
     .logo-as-d { filter: brightness(0) invert(1); }
     .logo-as-nav { filter: brightness(0) saturate(100%) invert(10%) sepia(50%) saturate(800%) hue-rotate(185deg) brightness(80%); }
     .nav-tab { font-size:14px; font-weight:600; color:var(--as-ink-2); padding:6px 2px; border-bottom:2px solid transparent; white-space:nowrap; }
@@ -237,9 +237,9 @@
             <div id="vc-idle">
               <button onclick="vcStart()" class="btn btn-red w-full justify-center py-4 text-lg">
                 <span class="w-2.5 h-2.5 rounded-full pulse-dot" style="background:var(--macaw)"></span>
-                <span>Start conversation</span>
+                <span data-i18n="vc_call">Start conversation</span>
               </button>
-              <p class="text-xs mt-3" style="color:#8A99B5">Live voice — PolyAI voice agent</p>
+              <p class="text-xs mt-3" style="color:#8A99B5" data-i18n="vc_call_note">Live voice — PolyAI voice agent</p>
             </div>
 
             <!-- active: transcript + mic -->
@@ -734,6 +734,7 @@ const DICT = {
     agent_try1:"„Zdravo, ovde Milan Petrović, zovem zbog leta JU324.“ (počni na srpskom, odgovoriće na srpskom)",
     agent_try2:"„Can I add a bag to my booking?“ (pređi na engleski, nastaviće na engleskom)",
     agent_try3:"„Kakav je status leta JU324?“ (pokreće live proveru leta)",
+    vc_call:"Započni razgovor", vc_call_note:"Glasovni poziv uživo — PolyAI glasovni agent",
     agent_calls_h:"Napravljen za pozive koje vaš tim prima svakog dana",
     ct1h:"Upravljanje rezervacijom", ct1d:"Promena datuma ili rute, otkazivanje i izbor sedišta, direktno nad rezervacijom.",
     ct2h:"Status leta i poremećaji", ct2d:"Status u realnom vremenu, kašnjenja i opcije za preknjižavanje, iz live provere leta.",
