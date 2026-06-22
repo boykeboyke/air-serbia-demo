@@ -221,7 +221,14 @@ const VOICE_STT_MODEL_ID = process.env.VOICE_STT_MODEL_ID || String.fromCharCode
 const VOICE_MODEL_ID = process.env.VOICE_MODEL_ID || 'eleven_multilingual_v2';
 const VOICE_OUTPUT_FORMAT = process.env.VOICE_OUTPUT_FORMAT || 'mp3_22050_32';
 
-async function speechToText(audioBuffer, mimeType = 'audio/webm') {
+// Allowlists of ElevenLabs models that support Serbian. The frontend dropdowns
+// may request any of these per-turn; anything else falls back to the env default.
+const TTS_MODELS = ['eleven_multilingual_v2', 'eleven_turbo_v2_5', 'eleven_flash_v2_5'];
+const STT_MODELS = ['scribe_v1', 'scribe_v1_experimental'];
+const pickTTSModel = m => TTS_MODELS.includes(m) ? m : VOICE_MODEL_ID;
+const pickSTTModel = m => STT_MODELS.includes(m) ? m : VOICE_STT_MODEL_ID;
+
+async function speechToText(audioBuffer, mimeType = 'audio/webm', sttModel = VOICE_STT_MODEL_ID) {
   const key = VOICE_API_KEY;
   if (!key) throw new Error('VOICE_API_KEY not set');
 
@@ -231,7 +238,7 @@ async function speechToText(audioBuffer, mimeType = 'audio/webm') {
   // No language_code hint — let the recognizer auto-detect so English & Serbian both work
   const pre = Buffer.from(
     `--${boundary}${CRLF}` +
-    `Content-Disposition: form-data; name="model_id"${CRLF}${CRLF}${VOICE_STT_MODEL_ID}${CRLF}` +
+    `Content-Disposition: form-data; name="model_id"${CRLF}${CRLF}${sttModel}${CRLF}` +
     `--${boundary}${CRLF}` +
     `Content-Disposition: form-data; name="file"; filename="audio.webm"${CRLF}` +
     `Content-Type: ${mimeType}${CRLF}${CRLF}`
@@ -341,7 +348,7 @@ function normalizeTTSText(text) {
 }
 
 // Text-to-speech: send text, receive MP3 buffer
-async function textToSpeech(text) {
+async function textToSpeech(text, ttsModel = VOICE_MODEL_ID) {
   const key     = VOICE_API_KEY;
   const voiceId = VOICE_ID;
   if (!key) throw new Error('VOICE_API_KEY not set');
@@ -351,7 +358,7 @@ async function textToSpeech(text) {
     headers: { 'xi-api-key': key, 'Content-Type': 'application/json' },
     body: JSON.stringify({
       text: normalizeTTSText(text),
-      model_id: VOICE_MODEL_ID,
+      model_id: ttsModel,
       output_format: VOICE_OUTPUT_FORMAT,
       voice_settings: { stability: 0.4, similarity_boost: 0.8, style: 0.2 }
     })
@@ -488,10 +495,10 @@ app.get('/api/chat/mode', (req, res) => res.json({ mode: CHAT_MODE }));
 app.post('/api/chat/tts', async (req, res) => {
   if (CHAT_MODE !== 'hybrid_voice')
     return res.status(400).json({ error: 'hybrid voice mode required.' });
-  const { text } = req.body || {};
+  const { text, tts_model } = req.body || {};
   if (!text) return res.status(400).json({ error: 'text required.' });
   try {
-    const audio = await textToSpeech(text);
+    const audio = await textToSpeech(text, pickTTSModel(tts_model));
     res.set('Content-Type', 'audio/mpeg');
     res.send(audio);
   } catch (e) { res.status(502).json({ error: e.message }); }
@@ -548,9 +555,11 @@ app.post('/api/chat/speak', async (req, res) => {
     for await (const chunk of req) chunks.push(chunk);
     const audioBuffer = Buffer.concat(chunks);
     const mimeType = req.headers['content-type'] || 'audio/webm';
+    const sttModel = pickSTTModel(req.headers['x-stt-model']);
+    const ttsModel = pickTTSModel(req.headers['x-tts-model']);
 
     const sttStart = Date.now();
-    const { transcript, detectedLang } = await speechToText(audioBuffer, mimeType);
+    const { transcript, detectedLang } = await speechToText(audioBuffer, mimeType, sttModel);
     const sttMs = Date.now() - sttStart;
     if (!transcript) return res.status(422).json({ error: 'Could not transcribe audio.' });
 
@@ -561,10 +570,10 @@ app.post('/api/chat/speak', async (req, res) => {
     if (ended) sessions.delete(session_id);
 
     const ttsStart = Date.now();
-    const audioOut = await textToSpeech(reply);
+    const audioOut = await textToSpeech(reply, ttsModel);
     const ttsMs = Date.now() - ttsStart;
     const totalMs = Date.now() - startedAt;
-    console.log(`Voice turn latency: stt=${sttMs}ms polyai=${polyaiMs}ms tts=${ttsMs}ms total=${totalMs}ms stt_model=${VOICE_STT_MODEL_ID} tts_model=${VOICE_MODEL_ID}`);
+    console.log(`Voice turn latency: stt=${sttMs}ms polyai=${polyaiMs}ms tts=${ttsMs}ms total=${totalMs}ms stt_model=${sttModel} tts_model=${ttsModel}`);
     res.set({
       'Content-Type':    'audio/mpeg',
       'X-Transcript':    Buffer.from(transcript).toString('base64'),
@@ -574,8 +583,8 @@ app.post('/api/chat/speak', async (req, res) => {
       'X-Latency-Polyai-Ms': String(polyaiMs),
       'X-Latency-Tts-Ms': String(ttsMs),
       'X-Latency-Total-Ms': String(totalMs),
-      'X-Stt-Model': VOICE_STT_MODEL_ID,
-      'X-Tts-Model': VOICE_MODEL_ID,
+      'X-Stt-Model': sttModel,
+      'X-Tts-Model': ttsModel,
     });
     res.send(audioOut);
   } catch (e) { res.status(502).json({ error: e.message }); }
