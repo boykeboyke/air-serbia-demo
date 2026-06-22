@@ -200,38 +200,8 @@
         <p class="text-lg mb-6" style="color:#C7D2E4" data-i18n="agent_sub">This is not a video. It is a working PolyAI voice agent calling a live model of Air Serbia's systems. It answers 24 hours a day with zero hold time. Press call and it greets the passenger by name, reads back their booking, and switches between Serbian and English the moment it hears the caller.</p>
         <div class="card-d p-6 mb-5">
 
-          <!-- polyai_full: PolyAI web widget -->
-          <div id="vp-polyai">
-            <button id="call-btn" onclick="startCall()" class="btn btn-red w-full justify-center py-4 text-lg">
-              <span class="w-2.5 h-2.5 rounded-full pulse-dot" style="background:var(--macaw)"></span>
-              <span data-i18n="agent_call">Start the call</span>
-            </button>
-            <p id="call-note" class="text-xs mt-3" style="color:#8A99B5" data-i18n="agent_call_note">Powered by PolyAI · bilingual · live Air Serbia systems</p>
-          </div>
-
           <!-- hybrid voice mode: ElevenLabs STT/TTS -->
-          <div id="vp-hybrid" style="display:none">
-
-            <!-- model pickers (presenter): choose ElevenLabs STT/TTS models per leg -->
-            <div class="grid grid-cols-2 gap-3 mb-4">
-              <label class="text-xs" style="color:#8A99B5">
-                <span class="block mb-1">STT model</span>
-                <select id="vc-stt-model" class="w-full text-xs rounded px-2 py-1.5"
-                  style="background:rgba(255,255,255,0.06);color:#C7D2E4;border:1px solid rgba(255,255,255,0.15)">
-                  <option value="scribe_v1">scribe_v1 (default)</option>
-                  <option value="scribe_v1_experimental">scribe_v1_experimental</option>
-                </select>
-              </label>
-              <label class="text-xs" style="color:#8A99B5">
-                <span class="block mb-1">TTS model</span>
-                <select id="vc-tts-model" class="w-full text-xs rounded px-2 py-1.5"
-                  style="background:rgba(255,255,255,0.06);color:#C7D2E4;border:1px solid rgba(255,255,255,0.15)">
-                  <option value="eleven_multilingual_v2">multilingual_v2 (quality)</option>
-                  <option value="eleven_turbo_v2_5">turbo_v2_5 (fast)</option>
-                  <option value="eleven_flash_v2_5">flash_v2_5 (fastest)</option>
-                </select>
-              </label>
-            </div>
+          <div id="vp-hybrid">
 
             <!-- idle: start button -->
             <div id="vc-idle">
@@ -264,20 +234,6 @@
           </div>
         </div>
 
-        <!-- Demo mode toggle — visible only to presenter -->
-        <div class="flex items-center gap-3 mt-4 mb-2">
-          <span class="text-xs font-semibold" style="color:#A9B6CC">Voice backend:</span>
-          <div class="flex items-center text-xs font-semibold rounded-full overflow-hidden" style="border:1px solid rgba(255,255,255,0.35)">
-            <button id="mode-polyai" onclick="setDemoMode('polyai_full')"
-              class="px-3 py-1.5 transition-colors" style="background:var(--as-red);color:#fff">
-              PolyAI
-            </button>
-            <button id="mode-eleven" onclick="setDemoMode('hybrid_voice')"
-              class="px-3 py-1.5 transition-colors" style="background:transparent;color:#fff">
-              ElevenLabs
-            </button>
-          </div>
-        </div>
 
         <div class="card-d p-5">
           <div class="text-sm font-semibold mb-3" style="color:var(--macaw)" data-i18n="agent_try_h">Try saying</div>
@@ -510,8 +466,8 @@ async function checkFlight() {
     el.innerHTML = '<span style="color:#FF9AA8">' + T('fs_err') + '</span>';
   }
 }
-// ---- Chat mode detection + voice chat ----
-let chatMode = 'polyai_full';
+// ---- Voice chat ----
+const chatMode = 'hybrid_voice';
 let vcSession = null;
 let vcRecorder = null;
 let vcRecording = false;
@@ -519,64 +475,17 @@ let vcPlaying = false;
 let vcChunks = [];
 
 async function initVoicePanel() {
-  // Server sets the default; localStorage lets the presenter override during a demo
-  try {
-    const r = await fetch('/api/chat/mode');
-    chatMode = (await r.json()).mode || 'polyai_full';
-  } catch(e) { chatMode = 'polyai_full'; }
-  const override = localStorage.getItem('demoMode');
-  if (override) chatMode = override;
-  applyDemoMode(chatMode);
-}
-
-function applyDemoMode(mode) {
-  chatMode = mode;
-  const isHybrid = mode === 'hybrid_voice';
-  document.getElementById('vp-polyai').style.display  = isHybrid ? 'none' : '';
-  document.getElementById('vp-hybrid').style.display  = isHybrid ? ''     : 'none';
-  // Toggle button highlights
-  document.getElementById('mode-polyai').style.background = isHybrid ? 'transparent' : 'var(--as-red)';
-  document.getElementById('mode-polyai').style.color      = isHybrid ? '#A9B6CC'     : '#fff';
-  document.getElementById('mode-eleven').style.background = isHybrid ? 'var(--as-red)' : 'transparent';
-  document.getElementById('mode-eleven').style.color      = isHybrid ? '#fff'          : '#A9B6CC';
-  // Hide PolyAI's own floating launcher when using ElevenLabs, show it otherwise
+  document.getElementById('vp-hybrid').style.display = '';
+  // Hide PolyAI's own floating launcher; the embedded panel is always ElevenLabs hybrid.
   const style = document.getElementById('polyai-launcher-style') || (() => {
     const s = document.createElement('style'); s.id = 'polyai-launcher-style';
     document.head.appendChild(s); return s;
   })();
-  // In ElevenLabs mode hide the PolyAI floating launcher; in PolyAI mode let it show
-  style.textContent = isHybrid
-    ? '#poly-ai-polyphone,#poly-ai-polyphone-bubble{display:none!important}'
-    : '';
-}
-
-function setDemoMode(mode) {
-  localStorage.setItem('demoMode', mode);
-  applyDemoMode(mode);
+  style.textContent = '#poly-ai-polyphone,#poly-ai-polyphone-bubble{display:none!important}';
 }
 
 function startCall() {
-  if (chatMode === 'hybrid_voice') { vcStart(); return; }
-  // PolyphoneAPI.connect() is the correct Polyphone widget API
-  if (window.PolyphoneAPI && typeof window.PolyphoneAPI.connect === 'function') {
-    window.PolyphoneAPI.connect(); return;
-  }
-  // Fallback: click the widget's own bubble launcher
-  const launcher = document.getElementById('poly-ai-polyphone-bubble');
-  if (launcher) { launcher.click(); return; }
-  document.getElementById('call-note').innerHTML = T('agent_call_pending');
-}
-
-// Selected ElevenLabs models (persisted so the presenter's choice survives reloads)
-function vcSttModel() { return document.getElementById('vc-stt-model').value; }
-function vcTtsModel() { return document.getElementById('vc-tts-model').value; }
-function vcInitModelPickers() {
-  [['vc-stt-model','vcSttModel'],['vc-tts-model','vcTtsModel']].forEach(([id, key]) => {
-    const el = document.getElementById(id);
-    const saved = localStorage.getItem(key);
-    if (saved && [...el.options].some(o => o.value === saved)) el.value = saved;
-    el.addEventListener('change', () => localStorage.setItem(key, el.value));
-  });
+  vcStart();
 }
 
 async function vcStart() {
@@ -599,7 +508,7 @@ async function vcStart() {
       try {
         const tr = await fetch('/api/chat/tts', {
           method: 'POST', headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ text: d.greeting, tts_model: vcTtsModel() })
+          body: JSON.stringify({ text: d.greeting })
         });
         if (tr.ok) {
           const blob = await tr.blob();
@@ -644,8 +553,7 @@ async function vcSendAudio() {
   try {
     const r = await fetch('/api/chat/speak', {
       method: 'POST',
-      headers: { 'content-type': 'audio/webm', 'x-session-id': vcSession.session_id, 'x-lang': vcSession.lang,
-                 'x-stt-model': vcSttModel(), 'x-tts-model': vcTtsModel() },
+      headers: { 'content-type': 'audio/webm', 'x-session-id': vcSession.session_id, 'x-lang': vcSession.lang },
       body: blob
     });
     if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.error || r.statusText); }
@@ -830,7 +738,6 @@ ids.forEach(id=>{ const el=document.getElementById(id); if(el) obs.observe(el); 
 // init
 setLang('sr');
 initVoicePanel();
-vcInitModelPickers();
 </script>
 </body>
 </html>
