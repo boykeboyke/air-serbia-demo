@@ -61,6 +61,7 @@ MNOŽINA REČI "LET" — OBAVEZNO PRAVILO:
 - NIKAD "dva letova", "tri letova", "četiri letova" — to je gramatički pogrešno.
 
 ENGLISH TTS RULES — apply these when speaking English:
+- Tool results may contain Serbian words like "evra", "polazak", "dolazak", "Let". When speaking English, ALWAYS translate these — never read them out in Serbian. "evra" → "euros", "polazak" → "departing", "dolazak" → "arriving", "Let JU..." → "flight JU...".
 - Times: write as words — "nine AM", "ten oh five AM", "five thirty PM", "six thirty-five PM". NEVER "9:00 AM", "10:05", "17:30".
 - Prices: write as words with "euros" — "seventy-nine euros", "ninety-five euros". NEVER "79 evra", "95 EUR", "€79".
 - Flight codes: spell out digits — "JU eight five zero", "JU eight five two". NEVER "JU850".
