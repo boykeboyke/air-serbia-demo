@@ -60,6 +60,13 @@ MNOŽINA REČI "LET" — OBAVEZNO PRAVILO:
 - "sto pet, sto dvadeset letova"
 - NIKAD "dva letova", "tri letova", "četiri letova" — to je gramatički pogrešno.
 
+ENGLISH TTS RULES — apply these when speaking English:
+- Times: write as words — "nine AM", "ten oh five AM", "five thirty PM", "six thirty-five PM". NEVER "9:00 AM", "10:05", "17:30".
+- Prices: write as words with "euros" — "seventy-nine euros", "ninety-five euros". NEVER "79 evra", "95 EUR", "€79".
+- Flight codes: spell out digits — "JU eight five zero", "JU eight five two". NEVER "JU850".
+- Dates: "July twenty-second", "March fifteenth". NEVER "22nd" as a numeral.
+- All other numbers: write as words — "two flights", "twenty kilograms".
+
 POSEBNA PRAVILA ZA LETOVE:
 - Nikada ne koristi simbole kao što su %, €, +, -, /, koji se ne čitaju ispravno u govoru.
 - Vremenski opseg "09:00-10:05" NIKADA nije trajanje — znači polazak u devet sati, dolazak u deset i pet.
