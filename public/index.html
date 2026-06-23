@@ -214,7 +214,15 @@
 
             <!-- active: transcript + mic -->
             <div id="vc-active" style="display:none">
-              <div id="vc-transcript" class="mb-4 space-y-2" style="max-height:220px;overflow-y:auto"></div>
+              <div class="mb-3">
+                <button onclick="vcToggleTranscript()" class="flex items-center gap-1.5 text-xs" style="background:none;border:none;cursor:pointer;color:#A9B6CC;padding:0">
+                  <svg id="vc-transcript-arrow" width="12" height="12" viewBox="0 0 12 12" fill="currentColor" style="transition:transform 0.2s;transform:rotate(-90deg)"><path d="M2 4l4 4 4-4"/></svg>
+                  Transcript
+                </button>
+                <div id="vc-transcript-wrap" style="display:none;margin-top:6px">
+                  <div id="vc-transcript" class="space-y-2" style="max-height:180px;overflow-y:auto"></div>
+                </div>
+              </div>
               <div class="flex items-center gap-3">
                 <button id="vc-mic-btn" class="vc-mic-btn" onclick="vcToggleRecord()">
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -605,6 +613,14 @@ function b64utf8(b64) {
 }
 
 function vcSetStatus(msg) { const el=document.getElementById('vc-status'); if(el) el.textContent=msg; }
+function vcToggleTranscript() {
+  const wrap = document.getElementById('vc-transcript-wrap');
+  const arrow = document.getElementById('vc-transcript-arrow');
+  const open = wrap.style.display === 'none';
+  wrap.style.display = open ? 'block' : 'none';
+  arrow.style.transform = open ? 'rotate(0deg)' : 'rotate(-90deg)';
+}
+
 function vcAddMsg(role, text) {
   if (!text) return;
   const el = document.getElementById('vc-transcript');
@@ -665,7 +681,7 @@ const DICT = {
     asm_mock4:"<strong class='text-navy'>Brend elementi.</strong> Boje i logotip su usklađeni iz javnih Air Serbia materijala; font je blizak besplatan izbor.",
     asm_why:"<strong class='text-navy'>Zašto je važno.</strong> Poenta je da Air Serbia može da čuje radnog glasovnog agenta za nekoliko dana, bez rizika po svoje sisteme i bez čekanja na security review. U pilotu se mock konektori zamenjuju vašim konektorima, a sample profil vašim podacima. Sve ostalo ostaje isto kao u razgovoru koji ste čuli.",
     proof_eyebrow:"Rezultati", proof_h:"Najteži razgovori, već rešeni.",
-    proof_sub:"PolyAI već vodi glasovne razgovore za kompanije koje obrađuju desetine miliona poziva godišnje. Još nema objavljene airline studije, pa ispod koristimo najbliže travel iskustvo i najveće višejezične implementacije. Svaki broj je iz objavljene PolyAI customer story.",
+    proof_sub:"PolyAI već vodi glasovne razgovore za kompanije koje obrađuju desetine miliona poziva godišnje. Još nema objavljene airline studije, pa ispod koristimo najbliže iskustvo iz putničkog sektora i najveće višejezične implementacije. Svaki broj je iz objavljene PolyAI customer story.",
     cs1_tag:"Utilities · dvojezično EN + ES", cs1_s1:"ušteđenih radnih sati", cs1_s2:"containment", cs1_s3:"porast CSAT", cs1_s4:"manje napora korisnika",
     cs2_tag:"Travel", cs2_s1:"poziva rešeno bez agenta", cs2_s2:"uvek dostupno", cs2_d:"FAQ i rutiranje za travel aplikaciju velikog obima, danonoćno.",
     cs3_tag:"Banking · Balkan · višejezično", cs3_s1:"automatizacija poziva", cs3_s2:"brže rutiranje", cs3_s3:"manje prekinutih poziva", cs3_s4:"NPS",
@@ -673,10 +689,10 @@ const DICT = {
     proof_logos_h:"Telefonske linije koje već koriste PolyAI",
     aries_eyebrow:"Implementacija", aries_body:"Aries AI je specijalizovani AI implementation partner za enterprise glasovne agente u PolyAI Studio. Ovaj demo — dvojezični agent, sistemske integracije i Air Serbia ton — napravio je Aries AI. Vodimo ceo proces, od prve analize poziva do produkcije.",
     about_eyebrow:"Platforma", about_h:"Glasovna platforma kojoj kompanije veruju za najteže pozive.",
-    about_body:"PolyAI pravi glasovne agente koji vode prirodan razgovor i završe konkretan posao. Kompanije u utilities, bankarstvu, travelu, hospitalityju i retailu već vode telefonske linije na ovoj platformi. Agenti rade na Raven modelu, treniranom na više od milijardu poslovnih razgovora. Nije chatbot. Nije chat kome je dodat glas.",
+    about_body:"PolyAI pravi glasovne agente koji vode prirodan razgovor i završe konkretan posao. Kompanije u komunalnim uslugama, bankarstvu, turizmu, hotelijerstvu i maloprodaji već vode telefonske linije na ovoj platformi. Agenti rade na Raven modelu, treniranom na više od milijardu poslovnih razgovora. Nije chatbot. Nije chat kome je dodat glas.",
     about_lang:"Platforma podržava preko 100 jezika, a Raven govori 24+. Srpsko-engleska linija je početak, ne granica.",
     about_c1h:"Zvuči kao Air Serbia", about_c1d:"Prirodan glas koji vodi razgovor, ne meni koji se čita naglas.",
-    about_c2h:"Poznaje pozivaoca", about_c2d:"Personalizacija na početku poziva iz vaših sistema, ne hladna skripta.",
+    about_c2h:"Poznaje pozivaoca", about_c2d:"Personalizacija na početku poziva iz vaših sistema, ne generički tekst.",
     about_c3h:"Radi, ne samo odgovara", about_c3d:"Poziva prave sisteme i prebacuje na čoveka kada je to bolji ishod.",
     price_eyebrow:"Cene", price_h:"Cena prati rešene pozive, ne broj sedišta.",
     price_body:"PolyAI se obično naplaćuje prema razgovorima koje agent stvarno obradi, pa trošak prati vrednost: svaki rešen poziv je poziv manje za kontakt-centar. Zajedno modelujemo vaše realne obime. Ovako engagement najčešće počinje.",
