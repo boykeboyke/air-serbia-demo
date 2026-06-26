@@ -60,7 +60,8 @@
     .fade-up { animation:fadeUp .7s ease-out both; }
     @keyframes fadeUp { from{opacity:0;transform:translateY(14px);} to{opacity:1;transform:none;} }
 
-    .logo-as { height:140px; width:auto; }
+    .logo-as { height:140px; width:auto; max-width:100%; }
+    @media (max-width:480px) { .logo-as { height:24px; } }
     .logo-as-d { filter: brightness(0) invert(1); }
     .logo-as-nav { filter: brightness(0) saturate(100%) invert(10%) sepia(50%) saturate(800%) hue-rotate(185deg) brightness(80%); }
     .nav-tab { font-size:14px; font-weight:600; color:var(--as-ink-2); padding:6px 2px; border-bottom:2px solid transparent; white-space:nowrap; }
@@ -71,7 +72,9 @@
     section { scroll-margin-top:80px; }
     .marquee-track { display:inline-flex; gap:3rem; animation:slide 28s linear infinite; }
     @keyframes slide { from{transform:translateX(0);} to{transform:translateX(-50%);} }
-    html { scroll-behavior:smooth; }
+    html { scroll-behavior:smooth; overflow-x:hidden; max-width:100vw; }
+    body { overflow-x:hidden; max-width:100vw; width:100%; }
+    .grid > * { min-width: 0; }
 
     /* ---- Voice Chat UI (hybrid voice mode) ---- */
     .vc-mic-btn {
@@ -370,7 +373,7 @@
       <div>
         <div class="flex items-center gap-2 mb-4">
           <span class="eyebrow" style="color:var(--as-muted)" data-i18n="about_eyebrow">Platform</span>
-          <svg style="height:20px;color:var(--as-navy)"><use href="#polyai-logo"></use></svg>
+          <svg viewBox="0 0 115 35" style="height:20px;width:auto;color:var(--as-navy)"><use href="#polyai-logo"></use></svg>
         </div>
         <h2 class="heading text-4xl md:text-5xl mb-5" data-i18n="about_h">The voice platform enterprises trust on their hardest calls.</h2>
         <p class="text-lg text-muted mb-4" data-i18n="about_body">PolyAI builds voice agents that hold a real conversation and get something done. Enterprises run their phone lines on us across utilities, banking, travel, hospitality and retail. The agents run on Raven, our own voice model, trained on over a billion enterprise conversations. Not a chatbot. Not voice bolted onto chat.</p>
@@ -448,7 +451,7 @@
       <a href="https://ariesai.org" target="_blank" rel="noopener" class="font-semibold" style="color:#fff;text-decoration:none">Aries AI</a>
       <span style="color:#4A5A75">·</span>
       <span data-i18n="foot_platform">platform</span>
-      <svg style="height:18px;color:#fff"><use href="#polyai-logo"></use></svg>
+      <svg viewBox="0 0 115 35" style="height:18px;width:auto;color:#fff"><use href="#polyai-logo"></use></svg>
     </div>
   </div>
   <div class="max-w-7xl mx-auto px-5 pb-10">
