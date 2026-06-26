@@ -481,23 +481,28 @@ let vcRecorder = null;
 let vcRecording = false;
 let vcPlaying = false;
 let vcChunks = [];
-let _audioCtx = null;
-function getAudioCtx() {
-  if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  return _audioCtx;
+// iOS Safari grants play permission per <audio> element, not per page.
+// We create ONE element, play a silent clip on it during the gesture to unlock it,
+// then reuse it for every TTS response by swapping src. This survives any number
+// of async awaits between the gesture and actual playback.
+const _SILENCE = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
+const _audioEl = new Audio();
+_audioEl.preload = 'none';
+function unlockAudio() {
+  _audioEl.src = _SILENCE;
+  _audioEl.play().catch(() => {});
 }
-function unlockAudio() { const ctx = getAudioCtx(); if (ctx.state === 'suspended') ctx.resume(); }
+let _currentBlobUrl = null;
 async function playMpeg(arrayBuffer) {
-  const ctx = getAudioCtx();
-  if (ctx.state === 'suspended') await ctx.resume();
-  const decoded = await ctx.decodeAudioData(arrayBuffer.slice(0));
-  return new Promise((resolve, reject) => {
-    const src = ctx.createBufferSource();
-    src.buffer = decoded;
-    src.connect(ctx.destination);
-    src.onended = resolve;
-    src.onerror = reject;
-    src.start(0);
+  if (_currentBlobUrl) { URL.revokeObjectURL(_currentBlobUrl); _currentBlobUrl = null; }
+  const url = URL.createObjectURL(new Blob([arrayBuffer], { type: 'audio/mpeg' }));
+  _currentBlobUrl = url;
+  return new Promise((resolve) => {
+    const done = () => { if (_currentBlobUrl === url) { URL.revokeObjectURL(url); _currentBlobUrl = null; } resolve(); };
+    _audioEl.onended = done;
+    _audioEl.onerror = done;
+    _audioEl.src = url;
+    _audioEl.play().catch(done);
   });
 }
 
