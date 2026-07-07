@@ -35,18 +35,18 @@
 ### Damaged Baggage (Art. 17.2)
 - PIR (Property Irregularity Report) must be filed at the arrival airport immediately upon noticing damage, or within 7 days of receipt
 - Written complaint to airline must follow within 7 days of receipt
-- Liability limit: 1,288 SDR per passenger (approx. EUR 1,550 / USD 1,700)
+- Liability limit: approx. EUR 1,550 per passenger (legal unit: 1,288 SDR under Montreal Convention)
 - Carrier may apply depreciation based on bag age and condition at time of damage
 - Required documents: PIR reference, boarding pass, baggage tag, damage photos, bag purchase receipt, repair/replacement quote
 
 ### Delayed Baggage (Art. 19)
 - Written complaint within 21 days of delivery date
 - Interim essential expenses (toiletries, clothing) claimable with receipts
-- Liability limit: 1,288 SDR per passenger
+- Liability limit: approx. EUR 1,550 per passenger
 
 ### Lost Baggage
 - Declared lost after 21 days from the date the carrier confirmed the delay
-- Liability limit: 1,288 SDR per passenger
+- Liability limit: approx. EUR 1,550 per passenger
 - Passenger must provide list of contents with estimated values
 
 ---

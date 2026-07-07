@@ -471,7 +471,7 @@
             <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style="background:var(--as-ground-2)">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--as-red)" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
             </div>
-            <div><div class="font-semibold text-sm text-navy" data-i18n="ct_bag_h">Damaged / delayed / lost baggage</div><div class="text-xs text-muted mt-0.5" data-i18n="ct_bag_d">PIR references, Montreal Convention limits (1,288 SDR), documentation checklists.</div></div>
+            <div><div class="font-semibold text-sm text-navy" data-i18n="ct_bag_h">Damaged / delayed / lost baggage</div><div class="text-xs text-muted mt-0.5" data-i18n="ct_bag_d">PIR references, Montreal Convention limits (up to ~€1,550), documentation checklists.</div></div>
           </div>
           <div class="flex gap-3 items-start">
             <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style="background:var(--as-ground-2)">
@@ -909,11 +909,37 @@ function setLang(lang){
 let claimsHistory = [];
 let claimsPendingImages = []; // [{base64, mediaType, description, thumb}]
 
+function claimsMd(text) {
+  const lines = text.split('\n');
+  let html = '', inUl = false, inOl = false;
+  const closeList = () => {
+    if (inUl) { html += '</ul>'; inUl = false; }
+    if (inOl) { html += '</ol>'; inOl = false; }
+  };
+  const inline = s => s
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/`(.*?)`/g, '<code>$1</code>');
+  for (let i = 0; i < lines.length; i++) {
+    const l = lines[i];
+    const h3 = l.match(/^### (.+)/); if (h3) { closeList(); html += `<h4 style="margin:.7em 0 .2em;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--as-navy)">${inline(h3[1])}</h4>`; continue; }
+    const h2 = l.match(/^## (.+)/);  if (h2) { closeList(); html += `<h3 style="margin:.8em 0 .3em;font-size:13px;font-weight:700;color:var(--as-navy)">${inline(h2[1])}</h3>`; continue; }
+    const h1 = l.match(/^# (.+)/);   if (h1) { closeList(); html += `<h2 style="margin:.6em 0 .4em;font-size:14px;font-weight:700;color:var(--as-navy)">${inline(h1[1])}</h2>`; continue; }
+    if (/^---+$/.test(l.trim())) { closeList(); html += '<hr style="border:none;border-top:1px solid var(--as-line);margin:.6em 0">'; continue; }
+    const ul = l.match(/^[-*] (.+)/); if (ul) { if (!inUl) { closeList(); html += '<ul style="margin:.3em 0 .3em 1.1em;padding:0">'; inUl = true; } html += `<li style="margin:.15em 0">${inline(ul[1])}</li>`; continue; }
+    const ol = l.match(/^\d+\. (.+)/); if (ol) { if (!inOl) { closeList(); html += '<ol style="margin:.3em 0 .3em 1.3em;padding:0">'; inOl = true; } html += `<li style="margin:.15em 0">${inline(ol[1])}</li>`; continue; }
+    closeList();
+    if (l.trim() === '') { html += '<div style="height:.4em"></div>'; } else { html += `<p style="margin:.1em 0">${inline(l)}</p>`; }
+  }
+  closeList();
+  return html;
+}
+
 function claimsAddMsg(role, text) {
   const el = document.getElementById('claims-msgs');
   const div = document.createElement('div');
   div.className = role === 'user' ? 'claims-msg-user' : 'claims-msg-agent';
-  div.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  div.innerHTML = role === 'user' ? text.replace(/&/g,'&amp;').replace(/</g,'&lt;') : claimsMd(text);
   el.appendChild(div);
   el.scrollTop = el.scrollHeight;
   return div;
