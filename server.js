@@ -640,7 +640,8 @@ When drafting a response email:
 When writing in Serbian, use natural Serbian — NOT literal translations and NOT Croatian forms.
 
 CORRECT Serbian terms:
-- let (flight) — NIKAD "letilica" (to znači aircraft/vazduhoplov)
+- let (flight) — NIKAD "letilica" (letilica je vazduhoplov, nije let)
+- When summarising a claim in your analysis section, write "Let: JU573" not "Letilica: JU573"
 - prtljag / kofer (baggage / suitcase)
 - aerodrom (airport) — ne "vazdušna luka" (to je hrvatski)
 - naknada / odšteta (compensation) — ne "kompenzacija"
@@ -662,6 +663,7 @@ ZABRANJENO u srpskom tekstu:
 - Ne koristiti "Sincerely", "Please find attached", "Best regards" ni slično u srpskom mejlu
 - Ne koristiti "boarding pass" kad pišeš potpuno na srpskom — koristi "karta za ukrcavanje"
 - Ne koristiti "baggage tag" — koristi "nalepnica prtljaga"
+- PAŽLJIVO proveri sve reči pre slanja — bez tipfelera u srpskim rečima (npr. "racunu" → "računu", "Fotografi" → "Fotografije", "Kop" → "Kopiju")
 
 ---
 
