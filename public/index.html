@@ -96,6 +96,19 @@
     .vc-msg-agent { background:rgba(217,238,80,0.07); border-radius:8px; padding:6px 10px;
       color:#fff; margin-right:15%; font-size:13px;
       border-left:2px solid var(--macaw); }
+
+    /* ---- Claims Chat UI ---- */
+    .claims-msg-user { background:var(--as-ground-2); border-radius:10px 10px 2px 10px;
+      padding:10px 14px; align-self:flex-end; max-width:82%; font-size:13px; color:var(--as-ink-2); }
+    .claims-msg-agent { background:#fff; border:1px solid var(--as-line); border-radius:10px 10px 10px 2px;
+      padding:10px 14px; align-self:flex-start; max-width:90%; font-size:13px; color:var(--as-ink-2);
+      border-left:3px solid var(--as-red); white-space:pre-wrap; line-height:1.6; }
+    .claims-msg-agent strong { color:var(--as-navy); font-weight:600; }
+    .claims-thinking { color:var(--as-muted); font-style:italic; font-size:12px; padding:6px 0; align-self:flex-start; }
+    .claims-img-thumb { width:56px; height:56px; object-fit:cover; border-radius:6px; border:1px solid var(--as-line); }
+    .claims-img-remove { position:absolute; top:-6px; right:-6px; width:18px; height:18px; border-radius:50%;
+      background:var(--as-red); color:#fff; font-size:11px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+      border:none; line-height:1; }
   </style>
 </head>
 <body>
@@ -124,6 +137,7 @@
       <a class="nav-tab" href="#about" data-i18n="nav_about">About</a>
       <a class="nav-tab" href="#pricing" data-i18n="nav_pricing">Pricing</a>
       <a class="nav-tab" href="#rollout" data-i18n="nav_rollout">Rollout</a>
+      <a class="nav-tab" href="#claims" data-i18n="nav_claims">Claims AI</a>
       <a class="nav-tab" href="#next" data-i18n="nav_next">What's next</a>
     </nav>
     <div class="flex items-center gap-3 shrink-0">
@@ -440,6 +454,110 @@
   </div>
 </section>
 
+<!-- ====================== CLAIMS AI ====================== -->
+<section id="claims" class="bg-white">
+  <div class="max-w-7xl mx-auto px-5 py-20 md:py-28">
+    <div class="eyebrow mb-4" data-i18n="claims_eyebrow">Claims Management AI</div>
+    <h2 class="heading text-4xl md:text-5xl mb-4" data-i18n="claims_h">Draft responses. Assess claims. In seconds.</h2>
+    <p class="text-lg text-muted max-w-3xl mb-12" data-i18n="claims_sub">A claims assistant trained on EC 261/2004, the Montreal Convention, and Air Serbia's guest support procedures. Paste a passenger complaint, upload damage photos, and get a ready-to-send response email.</p>
+
+    <div class="grid lg:grid-cols-5 gap-10 items-start">
+
+      <!-- Left: claim types + info -->
+      <div class="lg:col-span-2 space-y-4">
+        <div class="eyebrow mb-3" data-i18n="claims_types_h">Claim types handled</div>
+        <div class="card p-5 space-y-3">
+          <div class="flex gap-3 items-start">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style="background:var(--as-ground-2)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--as-red)" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+            </div>
+            <div><div class="font-semibold text-sm text-navy" data-i18n="ct_bag_h">Damaged / delayed / lost baggage</div><div class="text-xs text-muted mt-0.5" data-i18n="ct_bag_d">PIR references, Montreal Convention limits (1,288 SDR), documentation checklists.</div></div>
+          </div>
+          <div class="flex gap-3 items-start">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style="background:var(--as-ground-2)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--as-red)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div><div class="font-semibold text-sm text-navy" data-i18n="ct_delay_h">Flight delays &amp; cancellations</div><div class="text-xs text-muted mt-0.5" data-i18n="ct_delay_d">EC 261/2004 compensation (€250–€600), extraordinary circumstances, right to care.</div></div>
+          </div>
+          <div class="flex gap-3 items-start">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style="background:var(--as-ground-2)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--as-red)" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </div>
+            <div><div class="font-semibold text-sm text-navy" data-i18n="ct_div_h">Diversions &amp; denied boarding</div><div class="text-xs text-muted mt-0.5" data-i18n="ct_div_d">Passenger rebooking obligations, hotel/meal costs, onward transport.</div></div>
+          </div>
+          <div class="flex gap-3 items-start">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style="background:var(--as-ground-2)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--as-red)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div><div class="font-semibold text-sm text-navy" data-i18n="ct_email_h">Draft response emails</div><div class="text-xs text-muted mt-0.5" data-i18n="ct_email_d">Paste any inbound complaint and get a professional reply, in English or Serbian.</div></div>
+          </div>
+        </div>
+
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-navy mb-2" data-i18n="claims_tips_h">Try these prompts</div>
+          <ul class="space-y-2">
+            <li><button class="text-left text-xs w-full hover:text-red transition-colors" style="background:none;border:none;cursor:pointer;color:var(--as-ink-2);padding:0" onclick="claimsSetPrompt(this)" data-i18n="tip1">Passenger's bag was smashed on JU573 MAD→BEG on 22 Jun 2026. She has a PIR filed at Madrid. She wants a replacement suitcase. Draft a response email.</button></li>
+            <li><button class="text-left text-xs w-full hover:text-red transition-colors" style="background:none;border:none;cursor:pointer;color:var(--as-ink-2);padding:0" onclick="claimsSetPrompt(this)" data-i18n="tip2">Flight JU242 BEG→CDG on 18 Jun 2026 diverted to ZRH due to thunderstorm at CDG. Return JU243 CDG→BEG was cancelled. What compensation is owed?</button></li>
+            <li><button class="text-left text-xs w-full hover:text-red transition-colors" style="background:none;border:none;cursor:pointer;color:var(--as-ink-2);padding:0" onclick="claimsSetPrompt(this)" data-i18n="tip3">What documents does a passenger need to submit for a damaged baggage claim, and what is the deadline?</button></li>
+          </ul>
+        </div>
+
+        <div class="card p-5" style="border-color:var(--as-line)">
+          <div class="text-xs font-semibold text-navy mb-1" data-i18n="claims_img_tip_h">Image analysis</div>
+          <p class="text-xs text-muted" data-i18n="claims_img_tip_d">Upload a photo of the damage, boarding pass, baggage tag, or PIR form. The AI describes what it sees and includes that detail in its assessment.</p>
+        </div>
+      </div>
+
+      <!-- Right: chat window -->
+      <div class="lg:col-span-3">
+        <div class="card" style="border-radius:16px;overflow:hidden">
+          <!-- chat header -->
+          <div class="flex items-center gap-3 px-5 py-4 border-b" style="border-color:var(--as-line);background:var(--as-ground-2)">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background:var(--as-navy)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div>
+              <div class="text-sm font-semibold text-navy" data-i18n="claims_agent_name">Claims Assistant</div>
+              <div class="text-xs text-muted" data-i18n="claims_agent_sub">EC 261 · Montreal Convention · Air Serbia procedures</div>
+            </div>
+            <div class="ml-auto flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full pulse-dot" style="background:var(--macaw)"></span>
+              <span class="text-xs text-muted" data-i18n="claims_live">Active</span>
+            </div>
+          </div>
+
+          <!-- messages -->
+          <div id="claims-msgs" style="height:360px;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px">
+            <div class="claims-msg-agent" id="claims-welcome">
+              <div style="font-size:13px;line-height:1.55;color:var(--as-ink-2)" data-i18n="claims_welcome">Hello! I'm the Air Serbia claims assistant. I can help you assess passenger claims, check entitlements under EC 261/2004 and the Montreal Convention, and draft professional response emails.<br><br>Paste a complaint or describe a situation — or upload a photo of the damage, boarding pass, or PIR form.</div>
+            </div>
+          </div>
+
+          <!-- image preview strip (hidden when empty) -->
+          <div id="claims-img-strip" style="display:none;padding:0 16px 8px;gap:8px;flex-wrap:wrap"></div>
+
+          <!-- input row -->
+          <div class="border-t" style="border-color:var(--as-line);padding:12px 16px;background:#fff">
+            <div style="display:flex;gap:8px;align-items:flex-end">
+              <!-- image upload -->
+              <label style="cursor:pointer;flex-shrink:0" title="Upload image">
+                <input type="file" id="claims-img-input" accept="image/*" multiple style="display:none" onchange="claimsHandleImages(event)">
+                <div style="width:36px;height:36px;border-radius:8px;border:1px solid var(--as-line);display:flex;align-items:center;justify-content:center;background:#fff;transition:.15s" onmouseover="this.style.borderColor='var(--as-navy)'" onmouseout="this.style.borderColor='var(--as-line)'">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--as-ink-2)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                </div>
+              </label>
+              <textarea id="claims-input" rows="2" placeholder="Paste a complaint or describe the claim…" style="flex:1;border:1px solid var(--as-line);border-radius:8px;padding:8px 12px;font-size:13px;resize:none;outline:none;font-family:inherit;color:var(--as-ink);transition:border-color .15s" onfocus="this.style.borderColor='var(--as-navy)'" onblur="this.style.borderColor='var(--as-line)'" onkeydown="if(event.key==='Enter'&&(event.ctrlKey||event.metaKey))claimsSend()" data-i18n-ph="claims_placeholder"></textarea>
+              <button onclick="claimsSend()" id="claims-send-btn" class="btn btn-red" style="height:36px;padding:0 16px;font-size:13px;align-self:flex-end;flex-shrink:0" data-i18n="claims_send">Send</button>
+            </div>
+            <div class="text-xs text-muted mt-2" data-i18n="claims_hint">Ctrl+Enter to send · Images are described by AI before being included in the analysis</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
 </main>
 
 <!-- ====================== FOOTER ====================== -->
@@ -734,6 +852,32 @@ const DICT = {
     next_body:"Agenta kog ste upravo pozvali napravio je Aries AI u PolyAI Studio. Ton, tokovi i pravila su podesivi, uz punu istoriju verzija i analizu svakog razgovora. Sledeći korak: ulazimo zajedno u platformu, gradimo jedan tok uživo i povezujemo prvi pravi sistem.",
     next_cta:"Zakaži sesiju",
     next1:"Napravimo novi tok uživo", next2:"Povežemo jedan vaš pravi sistem", next3:"Pokrenemo testove",
+    nav_claims:"Claims AI",
+    claims_eyebrow:"Upravljanje reklamacijama",
+    claims_h:"Procena reklamacija i odgovori. Za nekoliko sekundi.",
+    claims_sub:"Asistent obučen na osnovu Uredbe EZ 261/2004, Montrealske konvencije i procedura Air Serbia Guest Support-a. Nalepite pritužbu putnika, priložite fotografije oštećenja i dobijte spreman odgovor mejlom.",
+    claims_types_h:"Vrste reklamacija",
+    ct_bag_h:"Oštećen / zakasnio / izgubljen prtljag",
+    ct_bag_d:"PIR referenca, limit po Montrealskoj konvenciji (1.288 SDR), lista potrebnih dokumenata.",
+    ct_delay_h:"Kašnjenje i otkazivanje letova",
+    ct_delay_d:"Naknada po EZ 261/2004 (250–600€), vanredne okolnosti, pravo na zbrinjavanje.",
+    ct_div_h:"Preusmerjavanje i uskraćeno ukrcavanje",
+    ct_div_d:"Obaveza preknjižavanja, troškovi hotela i obroka, organizacija prevoza.",
+    ct_email_h:"Odgovor mejlom",
+    ct_email_d:"Nalepite pritužbu i dobijte profesionalan odgovor na srpskom ili engleskom.",
+    claims_tips_h:"Probajte ove primere",
+    tip1:"Putnici je kofer uništen na letu JU573 MAD→BEG dana 22. juna 2026. Podnela je PIR u Madridu. Traži zamenu kofra. Napravi odgovor mejlom.",
+    tip2:"Let JU242 BEG→CDG od 18. juna 2026. preusmeren je u ZRH zbog oluje nad CDG. Povratni let JU243 CDG→BEG je otkazan. Kakva naknada se duguje?",
+    tip3:"Koja dokumenta putnik treba da podnese uz reklamaciju za oštećen prtljag i koji je rok?",
+    claims_img_tip_h:"Analiza fotografija",
+    claims_img_tip_d:"Priložite fotografiju oštećenja, kartu za ukrcavanje, nalepnicu prtljaga ili PIR obrazac. AI opisuje šta vidi i uključuje te podatke u analizu.",
+    claims_agent_name:"Asistent za reklamacije",
+    claims_agent_sub:"EZ 261 · Montrealska konvencija · Procedure Air Serbia",
+    claims_live:"Aktivan",
+    claims_welcome:"Zdravo! Ja sam asistent Air Serbia za reklamacije. Mogu da pomognem u proceni pritužbi putnika, proveri prava po EZ 261/2004 i Montrealskoj konvenciji i pripremi odgovora mejlom.<br><br>Nalepite pritužbu ili opišite slučaj — ili priložite fotografiju oštećenja, karte za ukrcavanje ili PIR obrasca.",
+    claims_send:"Pošalji",
+    claims_placeholder:"Nalepite pritužbu putnika ili opišite slučaj reklamacije…",
+    claims_hint:"Ctrl+Enter za slanje · Fotografije se opisuju pre uključivanja u analizu",
     foot_by:"Implementira",
     foot_platform:"platforma",
     foot_note:"Demo za Air Serbia napravio je Aries AI, koristeći PolyAI Studio. Prikazani profil putnika je ilustrativni sample podatak. Brojevi iz case study materijala preuzeti su iz objavljenih PolyAI customer stories. Boje brenda i logotip usklađeni su prema javnim Air Serbia materijalima i nisu zvanični brand handover.",
@@ -761,8 +905,137 @@ function setLang(lang){
   document.getElementById('lang-sr').style.color = (lang==='sr')?'#fff':'var(--as-ink-2)';
 }
 
+// ---- Claims chatbot ----
+let claimsHistory = [];
+let claimsPendingImages = []; // [{base64, mediaType, description, thumb}]
+
+function claimsAddMsg(role, text) {
+  const el = document.getElementById('claims-msgs');
+  const div = document.createElement('div');
+  div.className = role === 'user' ? 'claims-msg-user' : 'claims-msg-agent';
+  div.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+  return div;
+}
+
+function claimsSetPrompt(btn) {
+  document.getElementById('claims-input').value = btn.textContent.trim();
+  document.getElementById('claims-input').focus();
+}
+
+async function claimsHandleImages(event) {
+  const files = Array.from(event.target.files || []);
+  if (!files.length) return;
+  const strip = document.getElementById('claims-img-strip');
+  strip.style.display = 'flex';
+
+  for (const file of files) {
+    const mediaType = file.type || 'image/jpeg';
+    const reader = new FileReader();
+    const base64 = await new Promise(resolve => {
+      reader.onload = e => resolve(e.target.result.split(',')[1]);
+      reader.readAsDataURL(file);
+    });
+
+    // Thumbnail
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = 'position:relative;display:inline-block';
+    const img = document.createElement('img');
+    img.className = 'claims-img-thumb';
+    img.src = `data:${mediaType};base64,${base64}`;
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'claims-img-remove';
+    removeBtn.innerHTML = '×';
+    const idx = claimsPendingImages.length;
+    removeBtn.onclick = () => { claimsPendingImages.splice(idx, 1); wrapper.remove(); if (!claimsPendingImages.length) strip.style.display = 'none'; };
+    wrapper.appendChild(img);
+    wrapper.appendChild(removeBtn);
+    strip.appendChild(wrapper);
+
+    // Describe the image
+    const pending = { base64, mediaType, description: null };
+    claimsPendingImages.push(pending);
+    try {
+      const r = await fetch('/api/claims/analyze-image', {
+        method: 'POST', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ data: base64, mediaType })
+      });
+      const d = await r.json();
+      if (d.description) {
+        pending.description = d.description;
+        img.title = d.description;
+        img.style.outline = '2px solid var(--macaw)';
+      }
+    } catch(e) { console.warn('Image description failed:', e.message); }
+  }
+  event.target.value = '';
+}
+
+async function claimsSend() {
+  const input = document.getElementById('claims-input');
+  const text = input.value.trim();
+  const images = claimsPendingImages.filter(i => i.description);
+
+  if (!text && !images.length) return;
+
+  const sendBtn = document.getElementById('claims-send-btn');
+  sendBtn.disabled = true;
+
+  // Build display text
+  let displayText = text;
+  if (images.length) displayText += (text ? '\n\n' : '') + `[${images.length} image(s) attached]`;
+  claimsAddMsg('user', displayText || '[image attached]');
+
+  // Build content for the API
+  let msgContent = text || '';
+  if (images.length) {
+    const imgDescriptions = images.map((img, i) =>
+      `[Image ${i+1} description: ${img.description}]`
+    ).join('\n');
+    msgContent = (msgContent ? msgContent + '\n\n' : '') + imgDescriptions;
+  }
+
+  claimsHistory.push({ role: 'user', content: msgContent });
+  input.value = '';
+
+  // Clear pending images
+  claimsPendingImages = [];
+  const strip = document.getElementById('claims-img-strip');
+  strip.innerHTML = '';
+  strip.style.display = 'none';
+
+  // Thinking indicator
+  const el = document.getElementById('claims-msgs');
+  const thinking = document.createElement('div');
+  thinking.className = 'claims-thinking';
+  thinking.textContent = '…';
+  el.appendChild(thinking);
+  el.scrollTop = el.scrollHeight;
+
+  try {
+    const r = await fetch('/api/claims/chat', {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ messages: claimsHistory })
+    });
+    const d = await r.json();
+    thinking.remove();
+    if (d.error) {
+      claimsAddMsg('agent', '⚠ ' + d.error);
+    } else {
+      claimsHistory.push({ role: 'assistant', content: d.reply });
+      claimsAddMsg('agent', d.reply);
+    }
+  } catch(e) {
+    thinking.remove();
+    claimsAddMsg('agent', '⚠ Network error: ' + e.message);
+  }
+  sendBtn.disabled = false;
+  el.scrollTop = el.scrollHeight;
+}
+
 // ---- Active-tab underline on scroll ----
-const ids = ['agent','assumptions','proof','about','pricing','rollout','next'];
+const ids = ['agent','assumptions','proof','about','pricing','rollout','claims','next'];
 const obs = new IntersectionObserver((entries)=>{
   entries.forEach(e=>{ if(e.isIntersecting){
     document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));

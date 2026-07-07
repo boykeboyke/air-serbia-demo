@@ -32,7 +32,7 @@ const LEGACY_HYBRID_MODE = String.fromCharCode(101,108,101,118,101,110,108,97,98
 const CHAT_MODE = RAW_CHAT_MODE === LEGACY_HYBRID_MODE ? 'hybrid_voice' : RAW_CHAT_MODE;
 console.log(`Chat mode: ${CHAT_MODE}`);
 
-app.use(express.json());
+app.use(express.json({ limit: '20mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ── TTL cache (protects live upstreams from demo retries) ────────────────────
@@ -594,6 +594,162 @@ app.post('/api/chat/end', async (req, res) => {
     sessions.delete(session_id);
     res.json({ ok: true, warning: e.message });
   }
+});
+
+// ════════════════════════════════════════════════════════════════════════════
+// CLAIMS CHATBOT — Claude-powered (requires ANTHROPIC_API_KEY in .env)
+// ════════════════════════════════════════════════════════════════════════════
+
+const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+const ANTHROPIC_BASE_URL = process.env.ANTHROPIC_BASE_URL || 'https://api.anthropic.com';
+
+const CLAIMS_POLICY = fs.readFileSync(path.join(__dirname, 'docs/claims-policies.md'), 'utf8');
+
+const CLAIMS_SYSTEM_PROMPT = `You are an expert claims assistant for Air Serbia (IATA code: JU), supporting the airline's Guest Support and Claims department. Your role is to help claims agents process passenger complaints, draft professional response emails, and advise on eligibility and next steps under applicable regulations.
+
+## Policy knowledge base
+
+${CLAIMS_POLICY}
+
+---
+
+## Your tasks
+1. **Answer policy questions** — explain passenger rights, eligibility, deadlines and procedures clearly and accurately.
+2. **Assess claim validity** — identify the applicable regulation, assess compensation or reimbursement eligibility, flag missing information.
+3. **Draft professional response emails** — write formal, empathetic emails on behalf of the Air Serbia claims department. Follow the email rules below precisely.
+4. **Identify missing information** — clearly state what documentation or details are still needed before a claim can be processed.
+
+---
+
+## Email drafting rules (CRITICAL — follow exactly)
+
+When drafting a response email:
+- Detect the language of the incoming claim/complaint and reply in THAT language only
+- If the incoming message is in Serbian → write the email ENTIRELY in Serbian. Zero English words.
+- If the incoming message is in English → write the email ENTIRELY in English. Zero Serbian words.
+- NEVER mix languages in a single email — not even one sentence
+- Structure: subject line, salutation, body (acknowledgement → legal position → required docs → next steps → timeline), sign-off
+- Sign-off: "Air Serbia — Tim gostinske podrške" (Serbian) or "Air Serbia Guest Support Team" (English)
+- Tone: formal, empathetic, precise — never dismissive
+- Length: under 300 words unless the situation genuinely requires more
+
+---
+
+## Serbian language rules (OBAVEZNO)
+
+When writing in Serbian, use natural Serbian — NOT literal translations and NOT Croatian forms.
+
+CORRECT Serbian terms:
+- let (flight) — NIKAD "letilica" (to znači aircraft/vazduhoplov)
+- prtljag / kofer (baggage / suitcase)
+- aerodrom (airport) — ne "vazdušna luka" (to je hrvatski)
+- naknada / odšteta (compensation) — ne "kompenzacija"
+- reklamacija / pritužba (claim/complaint)
+- zahtev (request) — ne "zahtjev" (hrvatski)
+- izveštaj (report) — ne "izvještaj" (hrvatski)
+- podnet / podneta (filed) — ne "podnešen/podnešena" (hrvatski)
+- preusmerjavanje (diversion) — ne "preusmjeravanje" (hrvatski)
+- zbrinjavanje putnika (right to care)
+- odgovor mejlom (email reply) — NIKAD "odgovorni email"
+- karta za ukrcavanje (boarding pass) — u srpskom tekstu ne "boarding pass"
+- nalepnica prtljaga (baggage tag) — u srpskom tekstu ne "baggage tag"
+- ponuda za popravku ili zamenu (repair/replacement quote)
+- u skladu sa (in accordance with) — ne "prema" samo ako nije prirodno
+- rok od 20 radnih dana (within 20 business days)
+
+ZABRANJENO u srpskom tekstu:
+- Nikakve engleske fraze unutar srpske rečenice
+- Ne koristiti "Sincerely", "Please find attached", "Best regards" ni slično u srpskom mejlu
+- Ne koristiti "boarding pass" kad pišeš potpuno na srpskom — koristi "karta za ukrcavanje"
+- Ne koristiti "baggage tag" — koristi "nalepnica prtljaga"
+
+---
+
+## Style guidelines
+- Professional, empathetic, precise
+- Never promise specific amounts unless the regulation is clearly applicable
+- For extraordinary circumstances (weather, ATC): acknowledge frustration, explain legal position, emphasize that right to care (zbrinjavanje) is still owed
+- For baggage claims at third-party handled airports: acknowledge ground handler's role but confirm Air Serbia is responsible for the claim
+- If information is missing, list exactly what is needed — don't give a generic response`;
+
+async function claudeChat(messages) {
+  if (!ANTHROPIC_API_KEY) throw new Error('ANTHROPIC_API_KEY not set — add it to .env');
+  const r = await fetch(`${ANTHROPIC_BASE_URL}/v1/messages`, {
+    method: 'POST',
+    headers: {
+      'x-api-key': ANTHROPIC_API_KEY,
+      'anthropic-version': '2023-06-01',
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 1500,
+      system: CLAIMS_SYSTEM_PROMPT,
+      messages,
+    }),
+  });
+  if (!r.ok) { const t = await r.text(); throw new Error(`Anthropic ${r.status}: ${t}`); }
+  const data = await r.json();
+  return data.content?.[0]?.text || '';
+}
+
+async function claudeDescribeImage(base64Data, mediaType) {
+  if (!ANTHROPIC_API_KEY) throw new Error('ANTHROPIC_API_KEY not set — add it to .env');
+  const r = await fetch(`${ANTHROPIC_BASE_URL}/v1/messages`, {
+    method: 'POST',
+    headers: {
+      'x-api-key': ANTHROPIC_API_KEY,
+      'anthropic-version': '2023-06-01',
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 500,
+      messages: [{
+        role: 'user',
+        content: [
+          {
+            type: 'image',
+            source: { type: 'base64', media_type: mediaType, data: base64Data },
+          },
+          {
+            type: 'text',
+            text: 'This is an image from an airline claims submission. Describe what you see in detail: type of document or object, visible damage, text/numbers visible (flight numbers, reference numbers, dates, names, PNR codes, amounts), and any information relevant to an airline baggage or passenger rights claim. Be concise but thorough (3–6 sentences).',
+          },
+        ],
+      }],
+    }),
+  });
+  if (!r.ok) { const t = await r.text(); throw new Error(`Anthropic ${r.status}: ${t}`); }
+  const data = await r.json();
+  return data.content?.[0]?.text || '';
+}
+
+// POST /api/claims/analyze-image
+// Body: { data: "<base64>", mediaType: "image/jpeg" }
+// Returns: { description }
+app.post('/api/claims/analyze-image', express.json({ limit: '10mb' }), async (req, res) => {
+  const { data, mediaType } = req.body || {};
+  if (!data || !mediaType) return res.status(400).json({ error: 'data and mediaType required' });
+  const allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+  if (!allowed.includes(mediaType)) return res.status(400).json({ error: 'Unsupported image type' });
+  try {
+    const description = await claudeDescribeImage(data, mediaType);
+    res.json({ description });
+  } catch (e) { res.status(502).json({ error: e.message }); }
+});
+
+// POST /api/claims/chat
+// Body: { messages: [{role:"user"|"assistant", content:"..."}] }
+// Returns: { reply }
+app.post('/api/claims/chat', express.json({ limit: '1mb' }), async (req, res) => {
+  const { messages } = req.body || {};
+  if (!Array.isArray(messages) || messages.length === 0)
+    return res.status(400).json({ error: 'messages array required' });
+  try {
+    const reply = await claudeChat(messages);
+    res.json({ reply });
+  } catch (e) { res.status(502).json({ error: e.message }); }
 });
 
 // ════════════════════════════════════════════════════════════════════════════
