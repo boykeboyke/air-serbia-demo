@@ -496,9 +496,10 @@
         <div class="card p-5">
           <div class="text-xs font-semibold text-navy mb-2" data-i18n="claims_tips_h">Try these prompts</div>
           <ul class="space-y-2">
-            <li><button class="text-left text-xs w-full hover:text-red transition-colors" style="background:none;border:none;cursor:pointer;color:var(--as-ink-2);padding:0" onclick="claimsSetPrompt(this)" data-i18n="tip1">Passenger's bag was smashed on JU573 MAD→BEG on 22 Jun 2026. She has a PIR filed at Madrid. She wants a replacement suitcase. Draft a response email.</button></li>
-            <li><button class="text-left text-xs w-full hover:text-red transition-colors" style="background:none;border:none;cursor:pointer;color:var(--as-ink-2);padding:0" onclick="claimsSetPrompt(this)" data-i18n="tip2">Flight JU242 BEG→CDG on 18 Jun 2026 diverted to ZRH due to thunderstorm at CDG. Return JU243 CDG→BEG was cancelled. What compensation is owed?</button></li>
-            <li><button class="text-left text-xs w-full hover:text-red transition-colors" style="background:none;border:none;cursor:pointer;color:var(--as-ink-2);padding:0" onclick="claimsSetPrompt(this)" data-i18n="tip3">What documents does a passenger need to submit for a damaged baggage claim, and what is the deadline?</button></li>
+            <li><button class="text-left text-xs w-full hover:text-red transition-colors" style="background:none;border:none;cursor:pointer;color:var(--as-ink-2);padding:0" onclick="claimsSetPrompt(this)" data-i18n="tip1">Passenger's bag was smashed on JU573 MAD→BEG on 22 Jun 2026. PIR filed at Madrid airport. She wants a replacement suitcase. Draft a response email.</button></li>
+            <li><button class="text-left text-xs w-full hover:text-red transition-colors" style="background:none;border:none;cursor:pointer;color:var(--as-ink-2);padding:0" onclick="claimsSetPrompt(this)" data-i18n="tip2">Passenger was denied boarding on JU101 BCN→BEG on 10 Jul 2026 due to overbooking. No volunteers were sought first. What are her rights and how much compensation is owed? Draft a response email.</button></li>
+            <li><button class="text-left text-xs w-full hover:text-red transition-colors" style="background:none;border:none;cursor:pointer;color:var(--as-ink-2);padding:0" onclick="claimsSetPrompt(this)" data-i18n="tip3">JU338 BEG→FCO on 5 Jul 2026 was cancelled. Passenger was notified 4 days before departure and offered rerouting via VIE arriving 5 hours late. Is compensation owed? How much?</button></li>
+            <li><button class="text-left text-xs w-full hover:text-red transition-colors" style="background:none;border:none;cursor:pointer;color:var(--as-ink-2);padding:0" onclick="claimsSetPrompt(this)" data-i18n="tip4">Flight JU204 LHR→BEG delayed 6 hours on 15 Jun 2026. No meals offered at the airport. Passenger bought food (€45 receipt) and a hotel room (€110 receipt). What can she claim?</button></li>
           </ul>
         </div>
 
@@ -866,9 +867,10 @@ const DICT = {
     ct_email_h:"Odgovor mejlom",
     ct_email_d:"Nalepite pritužbu i dobijte profesionalan odgovor na srpskom ili engleskom.",
     claims_tips_h:"Probajte ove primere",
-    tip1:"Putnici je kofer uništen na letu JU573 MAD→BEG dana 22. juna 2026. Podnela je PIR u Madridu. Traži zamenu kofra. Napravi odgovor mejlom.",
-    tip2:"Let JU242 BEG→CDG od 18. juna 2026. preusmeren je u ZRH zbog oluje nad CDG. Povratni let JU243 CDG→BEG je otkazan. Kakva naknada se duguje?",
-    tip3:"Koja dokumenta putnik treba da podnese uz reklamaciju za oštećen prtljag i koji je rok?",
+    tip1:"Putnici je kofer uništen na letu JU573 MAD→BEG dana 22. juna 2026. PIR je podneta na aerodromu u Madridu. Traži zamenu kofra. Napravi odgovor mejlom.",
+    tip2:"Putnici je uskraćeno ukrcavanje na letu JU101 BCN→BEG dana 10. jula 2026. zbog prekomernog broja rezervacija. Prethodno nisu traženi dobrovoljci. Koja su njena prava i kolika naknada joj pripada? Napravi odgovor mejlom.",
+    tip3:"Let JU338 BEG→FCO od 5. jula 2026. je ukinut. Putnik je obavešten 4 dana pre polaska i ponuđeno mu je preusmerenje preko Beča sa dolaskom 5 sati posle prvobitnog. Da li mu pripada naknada i kolika?",
+    tip4:"Let JU204 LHR→BEG kasnio je 6 sati dana 15. juna 2026. Na aerodromu nisu ponuđeni obroci. Putnica je platila hranu (45€ račun) i hotel (110€ račun). Šta može da potražuje?",
     claims_img_tip_h:"Analiza fotografija",
     claims_img_tip_d:"Priložite fotografiju oštećenja, kartu za ukrcavanje, nalepnicu prtljaga ili PIR obrazac. AI opisuje šta vidi i uključuje te podatke u analizu.",
     claims_agent_name:"Asistent za reklamacije",

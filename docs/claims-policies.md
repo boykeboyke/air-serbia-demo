@@ -51,6 +51,71 @@
 
 ---
 
+## Air Serbia — Official Passenger Rights Policy (from airserbia.com)
+
+### Uskraćeno ukrcavanje (Denied Boarding — Overbooking)
+
+Uskraćeno ukrcavanje znači da putniku nije dozvoljeno ukrcavanje uprkos propisnoj prijavi i potvrđenoj rezervaciji u roku za ček-in, osim zbog opravdanih razloga (zdravlje, bezbednost, nedostatak putnih isprava).
+
+**Procedure:**
+- Air Serbia prvo traži dobrovoljce (uz dogovorene benefite i pravo na odabir između nadoknade ili preusmerenja)
+- Ako nema dobrovoljaca, ukrcavanje se uskraćuje prisilno
+- Kod prisilnog uskraćivanja Air Serbia isplaćuje:
+  - €250 za letove do 1.500 km
+  - €400 za letove od 1.500 do 3.500 km
+  - €600 za letove preko 3.500 km
+- Naknada se smanjuje za 50% ako se ponudi preusmerenje i putnik stigne na odredište sa zakašnjenjem manjim od 2h/3h/4h (zavisno od daljine)
+- Na aerodromu BEG isplata po izboru: elektronski bankarski transfer, debitna/kreditna kartica, keš ili EMD vaučer
+- Na aerodromima u inostranstvu: pošalji zahtev Podršci putnicima — isplata EMD vaučerom ili bankarskim transferom
+- Putnik bira između: (a) pune nadoknade cene karte u roku od 7 dana + povratni let do polazišta; ili (b) preusmerenja pod sličnim uslovima u najkraćem roku ili kasnijeg datuma po izboru putnika
+- Besplatne prednosti: obroci/osveženja, 2 besplatna poziva/faks/mejl, hotelski smeštaj ako je potrebno + prevoz do/od aerodroma
+
+### Kašnjenje leta (Flight Delay)
+
+Pravo na besplatne prednosti nastaje kada se očekuje kašnjenje:
+- 2h+ za letove do 1.500 km
+- 3h+ za letove od 1.500 do 3.500 km
+- 4h+ za letove preko 3.500 km
+
+**Besplatne prednosti:** obroci/osveženja + 2 besplatna poziva/faks/mejl
+
+Ako se očekivano vreme polaska pomeri za ceo dan: besplatan hotel + prevoz do/od aerodroma.
+
+Ako je let odložen najmanje 5 sati: putnik ima pravo na punu nadoknadu cene karte u roku od 7 dana za nerealizovane delove putovanja (i realizovane ako let više ne služi svrsi), plus povratni let do polazišta ako je relevantno.
+
+**Napomena:** Kašnjenje ne daje pravo na EC 261 kompenzaciju (€250/€400/€600) — to pravo postoji samo kod uskraćenog ukrcavanja i ukidanja leta, ili kod kašnjenja od 3h+ na dolazištu sudskom praksom (Sturgeon).
+
+### Ukidanje leta (Cancellation)
+
+Air Serbia pruža:
+- Izbor između nadoknade (puna cena karte u roku od 7 dana) ili preusmerenja (u najkraćem roku ili po izboru)
+- Besplatne prednosti: obroci, 2 poziva/faks/mejl, hotel + prevoz (ako preusmerenje kreće sledećeg dana)
+- Kompenzacija: €250 / €400 / €600 po daljini (iste tablice kao kod uskraćenog ukrcavanja)
+- Kompenzacija se smanjuje 50% ako alternativni let stiže unutar 2h/3h/4h od originalnog dolaska
+- Isplata: EMD vaučer ili bankarski transfer — NE na licu mesta; zahtev se šalje Podršci putnicima
+
+**Kompenzacija se NE isplaćuje ako:**
+- Putnik obavešten ≥14 dana unapred
+- Obavešten 7–14 dana unapred i ponuđeno preusmerenje (polazak ≤2h ranije, dolazak ≤4h posle originalnog)
+- Obavešten <7 dana unapred i ponuđeno preusmerenje (polazak ≤1h ranije, dolazak ≤2h posle originalnog)
+- Air Serbia dokaže izuzetne okolnosti koje se nisu mogle izbeći ni razumnim merama
+
+### Premeštanje u nižu klasu (Downgrade)
+
+Putnik ima pravo na povraćaj dela cene karte u roku od 7 dana, u procentu koji zavisi od daljine leta.
+
+### Uslovi primene prava putnika
+
+Prava se primenjuju ako:
+- Let polazi sa aerodroma u ECCA zemlji ili stiže na ECCA aerodrom a Air Serbia je operativni prevoznik
+- Putnik ima potvrđenu rezervaciju
+- Putnik se pojavio na ček-inu u propisanom roku (ili najmanje 45 min pre polaska ako vreme nije navedeno)
+- Karta je izdata u okviru programa lojalnosti ili komercijalnog programa Air Serbie ili organizatora
+
+Prava se NE primenjuju na besplatne karte ili snižene cene koje nisu dostupne javnosti.
+
+---
+
 ## Air Serbia — Claims Procedures
 
 ### Damaged/Delayed/Lost Baggage
