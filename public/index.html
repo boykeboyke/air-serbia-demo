@@ -220,8 +220,10 @@
           <!-- hybrid voice mode: ElevenLabs STT/TTS -->
           <div id="vp-hybrid">
 
-            <!-- idle: start button -->
+            <!-- idle: voice picker + start button -->
             <div id="vc-idle">
+              <label class="text-xs mb-1.5 block" style="color:#A9B6CC" data-i18n="vc_voice_label">Agent voice</label>
+              <select id="vc-voice-select" class="w-full mb-3 text-sm" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:8px;padding:8px 10px"></select>
               <button onclick="vcStart()" class="btn btn-red w-full justify-center py-4 text-lg">
                 <span class="w-2.5 h-2.5 rounded-full pulse-dot" style="background:var(--macaw)"></span>
                 <span data-i18n="vc_call">Start conversation</span>
@@ -630,6 +632,8 @@ async function playMpeg(arrayBuffer) {
   });
 }
 
+let vcVoiceId = null;
+
 async function initVoicePanel() {
   document.getElementById('vp-hybrid').style.display = '';
   // Hide PolyAI's own floating launcher; the embedded panel is always ElevenLabs hybrid.
@@ -638,6 +642,26 @@ async function initVoicePanel() {
     document.head.appendChild(s); return s;
   })();
   style.textContent = '#poly-ai-polyphone,#poly-ai-polyphone-bubble{display:none!important}';
+  loadVoiceOptions();
+}
+
+async function loadVoiceOptions() {
+  const select = document.getElementById('vc-voice-select');
+  if (!select) return;
+  try {
+    const r = await fetch('/api/chat/voices');
+    const d = await r.json();
+    const saved = localStorage.getItem('vc_voice_id');
+    select.innerHTML = (d.voices || []).map(v =>
+      `<option value="${v.id}">${v.name} — ${v.description}</option>`
+    ).join('');
+    vcVoiceId = (saved && (d.voices || []).some(v => v.id === saved)) ? saved : d.default_voice_id;
+    select.value = vcVoiceId;
+    select.onchange = () => {
+      vcVoiceId = select.value;
+      localStorage.setItem('vc_voice_id', vcVoiceId);
+    };
+  } catch (e) { /* voice picker is optional; call still works with the server default */ }
 }
 
 function startCall() {
@@ -651,7 +675,7 @@ async function vcStart() {
     const lang = (LANG === 'sr') ? 'sr-RS' : 'en-US'; // greeting matches UI language toggle
     const r = await fetch('/api/chat/session', {
       method: 'POST', headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ lang })
+      body: JSON.stringify({ lang, voice_id: vcVoiceId })
     });
     const d = await r.json();
     if (d.error) throw new Error(d.error);
@@ -665,7 +689,7 @@ async function vcStart() {
       try {
         const tr = await fetch('/api/chat/tts', {
           method: 'POST', headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ text: d.greeting })
+          body: JSON.stringify({ text: d.greeting, voice_id: vcVoiceId })
         });
         if (tr.ok) {
           vcPlaying = true;
@@ -800,7 +824,7 @@ const DICT = {
     agent_try1:"„Zdravo, ovde Milan Petrović, zovem zbog leta JU324.“ (počni na srpskom, odgovoriće na srpskom)",
     agent_try2:"„Can I add a bag to my booking?“ (pređi na engleski, nastaviće na engleskom)",
     agent_try3:"„Kakav je status leta JU324?“ (pokreće live proveru leta)",
-    vc_call:"Započni razgovor", vc_call_note:"Glasovni poziv uživo — PolyAI glasovni agent",
+    vc_call:"Započni razgovor", vc_call_note:"Glasovni poziv uživo — PolyAI glasovni agent", vc_voice_label:"Glas agenta",
     agent_calls_h:"Napravljen za pozive koje vaš tim prima svakog dana",
     ct1h:"Upravljanje rezervacijom", ct1d:"Promena datuma ili rute, otkazivanje i izbor sedišta, direktno nad rezervacijom.",
     ct2h:"Status leta i poremećaji", ct2d:"Status u realnom vremenu, kašnjenja i opcije za preknjižavanje, iz live provere leta.",

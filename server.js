@@ -221,6 +221,23 @@ const VOICE_STT_MODEL_ID = process.env.VOICE_STT_MODEL_ID || 'scribe_v1';
 const VOICE_MODEL_ID = process.env.VOICE_MODEL_ID || 'eleven_flash_v2_5';
 const VOICE_OUTPUT_FORMAT = process.env.VOICE_OUTPUT_FORMAT || 'mp3_22050_32';
 
+// Curated allow-list of ElevenLabs voices the demo lets a visitor pick from.
+// Kept server-side (rather than trusting an arbitrary client-supplied voice_id)
+// so this endpoint can't be used as an open proxy to the ElevenLabs API.
+const AVAILABLE_VOICES = [
+  { id: 'peXmQaCErbfrWCM5FqjH', name: 'Marko', gender: 'male', description: 'Current default — warm baritone, conversational' },
+  { id: 'eWKPI657Btpf4xbqX4x6', name: 'Ana SRB', gender: 'female', description: 'Serbian call-centre voice' },
+  { id: 'd3l4f3HgkE3P6Fo91lYA', name: 'Ida', gender: 'female', description: 'Clear, confident Serbian' },
+  { id: 'j96cp162VcYdsYfSp1nc', name: 'Ivan', gender: 'male', description: 'Deep Serbian & Croatian (Balkan)' },
+  { id: '7IVTG9LKLYndnFiFDLU2', name: 'Milena', gender: 'female', description: 'Balkan premium (Serbian/Croatian)' },
+  { id: 'DAGnQ7r9sMtV0Q44g1Mi', name: 'Nikola', gender: 'male', description: 'Balkan pro (Serbian, Croatian)' },
+  { id: 'F2kYsMGahtg8auErVXgY', name: 'Dylan', gender: 'male', description: 'Professional, warm, fluent in Balkan languages' },
+];
+const VOICE_IDS = new Set(AVAILABLE_VOICES.map(v => v.id));
+function resolveVoiceId(candidate) {
+  return VOICE_IDS.has(candidate) ? candidate : VOICE_ID;
+}
+
 async function speechToText(audioBuffer, mimeType = 'audio/webm') {
   const key = VOICE_API_KEY;
   if (!key) throw new Error('VOICE_API_KEY not set');
@@ -341,9 +358,8 @@ function normalizeTTSText(text) {
 }
 
 // Text-to-speech: send text, receive MP3 buffer
-async function textToSpeech(text) {
-  const key     = VOICE_API_KEY;
-  const voiceId = VOICE_ID;
+async function textToSpeech(text, voiceId = VOICE_ID) {
+  const key = VOICE_API_KEY;
   if (!key) throw new Error('VOICE_API_KEY not set');
 
   const r = await fetch(`https://${VOICE_API_HOST}/v1/text-to-speech/${voiceId}`, {
@@ -483,31 +499,35 @@ app.post('/api/checkin', (req, res) => {
 // GET /api/chat/mode
 app.get('/api/chat/mode', (req, res) => res.json({ mode: CHAT_MODE }));
 
+// GET /api/chat/voices — list of ElevenLabs voices the demo lets a visitor pick from
+app.get('/api/chat/voices', (req, res) => res.json({ voices: AVAILABLE_VOICES, default_voice_id: VOICE_ID }));
+
 // POST /api/chat/tts — convert text to speech (used to speak the session greeting)
-// Body: { text }  Returns: audio/mpeg
+// Body: { text, voice_id? }  Returns: audio/mpeg
 app.post('/api/chat/tts', async (req, res) => {
   if (CHAT_MODE !== 'hybrid_voice')
     return res.status(400).json({ error: 'hybrid voice mode required.' });
-  const { text } = req.body || {};
+  const { text, voice_id } = req.body || {};
   if (!text) return res.status(400).json({ error: 'text required.' });
   try {
-    const audio = await textToSpeech(text);
+    const audio = await textToSpeech(text, resolveVoiceId(voice_id));
     res.set('Content-Type', 'audio/mpeg');
     res.send(audio);
   } catch (e) { res.status(502).json({ error: e.message }); }
 });
 
 // POST /api/chat/session — start a PolyAI conversation
-// Body: { lang?: "sr-RS" | "en-US" }
+// Body: { lang?: "sr-RS" | "en-US", voice_id? }
 // Returns: { session_id, greeting }
 app.post('/api/chat/session', async (req, res) => {
   if (CHAT_MODE === 'polyai_full')
     return res.status(400).json({ error: 'Chat API not used in polyai_full mode — use the voice widget.' });
   try {
     const lang = req.body?.lang || 'sr-RS';
+    const voiceId = resolveVoiceId(req.body?.voice_id);
     const { conversation_id, greeting } = await polyaiCreateSession(lang);
     const session_id = newSessionId();
-    sessions.set(session_id, { conversation_id, created_at: Date.now(), lang });
+    sessions.set(session_id, { conversation_id, created_at: Date.now(), lang, voiceId });
     res.json({ session_id, greeting });
   } catch (e) { res.status(502).json({ error: e.message }); }
 });
@@ -560,7 +580,7 @@ app.post('/api/chat/speak', async (req, res) => {
     if (ended) sessions.delete(session_id);
 
     const ttsStart = Date.now();
-    const audioOut = await textToSpeech(reply);
+    const audioOut = await textToSpeech(reply, session.voiceId);
     const ttsMs = Date.now() - ttsStart;
     const totalMs = Date.now() - startedAt;
     console.log(`Voice turn latency: stt=${sttMs}ms polyai=${polyaiMs}ms tts=${ttsMs}ms total=${totalMs}ms stt_model=${VOICE_STT_MODEL_ID} tts_model=${VOICE_MODEL_ID}`);
